@@ -1,0 +1,80 @@
+body{
+    background-color: #59c9fc;
+}
+
+.container1{
+    margin: 100px auto;
+    width: 350px;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 30px;
+}
+
+.title{
+    text-align: center;
+    color: #505050;
+    font-weight: bolder;
+    font-size: 35px;
+}
+
+form{
+    width: 100%;
+    /*margin-top: 30px;*/
+}
+
+form input {
+    font-size: 18px;
+    padding: 10px 20px 10px 5px;
+    border: none;
+    outline: none;
+    background: none;
+}
+
+.username{
+    display: block;
+    border-radius: 30px;
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.username svg{
+    height: 25px;
+    margin-bottom: 2px;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+#usertypes {
+    font-size: 13px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 5px 0px;
+    margin-bottom: 30px;
+    align-content: center;
+}
+
+/*#store-owner, #customer{
+    padding-left: 5px;
+    padding-right: 5px;
+    !*justify-content: space-between;*!
+}*/
+
+.login-btn{
+    width: 100%;
+    padding: 12px 10px;
+    border: none;
+    font-size: 18px;
+    border-radius: 30px;
+    background-color: #59c9fc;
+    color: white;
+    margin-bottom: 5px;
+}
+
+#login-error{
+    font-size: 13px;
+    color: red;
+    font-weight: bolder;
+}
+
