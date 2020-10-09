@@ -7,7 +7,7 @@ import java.util.*;
 
 public class SystemManager {
     private static int userID = 1000;
-
+    public static boolean isInnerInfoChangedInSomeZone = false;
     //    private final StoreManager storeManager = new StoreManager();
     private final ZonesManager zonesManager = new ZonesManager();
     private final UserManager userManager = new UserManager();
@@ -19,6 +19,15 @@ public class SystemManager {
         } else {
             zonesManager.addZonesToManagerList(zone.createZoneDTO());
         }
+    }
+
+    public ZoneManager getZone(String zoneName){
+        ZoneManager returnZone = zonesByName.getOrDefault(zoneName, null);
+        if (returnZone == null){
+            throw new ValueException("There is no zone named " + zoneName);
+        }
+
+        return returnZone;
     }
 
     public void addUser(String username, String userType) {
@@ -39,5 +48,9 @@ public class SystemManager {
 
     public ZonesManager getZonesManager() {
         return zonesManager;
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
     }
 }

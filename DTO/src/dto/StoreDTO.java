@@ -15,6 +15,11 @@ public class StoreDTO {
     private final List<SaleDTO> sales;
     private final List<ShoppingCartDTO> orders;
     private final double totalDeliveriesRevenues;
+    private final double totalItemsSoldRevenues;
+    private final int xCoordinate;
+    private final int yCoordinate;
+
+
 
     public StoreDTO(String ownerName, String storeName, int ID, Point location, List<SuperMarketItemDTO> superMarketItems,
                     double pricePerKilometer, List<SaleDTO> sales, List<ShoppingCartDTO> orders, double deliveriesRevenues) {
@@ -27,11 +32,23 @@ public class StoreDTO {
                 return "(" + getX() + "," + getY() + ")";
             }
         };
+        xCoordinate = location.x;
+        yCoordinate = location.y;
         this.superMarketItems = superMarketItems;
         this.pricePerKilometer = pricePerKilometer;
         this.sales = sales;
         this.orders = orders;
         totalDeliveriesRevenues = deliveriesRevenues;
+        totalItemsSoldRevenues = calculateItemsSoldRevenues(orders);
+    }
+
+    private double calculateItemsSoldRevenues(List<ShoppingCartDTO> orders) {
+        double sum = 0;
+        for (ShoppingCartDTO shoppingCart : orders){
+            sum +=shoppingCart.getTotalItemsPrice();
+        }
+
+        return sum;
     }
 
 //    public StoreDTO(Store store)

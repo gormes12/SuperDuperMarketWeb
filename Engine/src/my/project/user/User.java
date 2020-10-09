@@ -1,10 +1,13 @@
 package my.project.user;
 
+import dto.BankTransactionsDTO;
 import my.project.bank.BankAccount;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public abstract class User {
+
 
     public enum eUserType{
         StoreOwner,
@@ -47,5 +50,13 @@ public abstract class User {
 
     public double getCreditBalance(){
         return bankAccount.getCreditBalance();
+    }
+
+    public int getBankTransactionsVersion() {
+        return bankAccount.getBankTransactionsVersion();
+    }
+
+    public List<BankTransactionsDTO> getTransactionsEntries(int fromIndex) {
+        return bankAccount.getTransactionsEntries(fromIndex);
     }
 }

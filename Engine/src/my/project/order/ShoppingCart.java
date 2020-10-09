@@ -4,7 +4,9 @@ import dto.ShoppingCartDTO;
 import dto.ShoppingCartItemDTO;
 import dto.StoreDTO;
 import my.project.item.ShoppingCartItem;
+import my.project.location.Location;
 import my.project.store.Store;
+import my.project.user.Customer;
 
 import java.awt.*;
 import java.text.MessageFormat;
@@ -14,19 +16,30 @@ import java.util.List;
 
 public class ShoppingCart {
     private final int orderID;
-    private /*HashMap<Integer, ShoppingCartItem>*/List<ShoppingCartItem> cartItem;  //Integer: ItemSerialNumber
+    private List<ShoppingCartItem> cartItem;
     private double deliveryCost;
     private double distanceFromStore;
     private LocalDate orderDate;
     private Store storeDetails;
+    private Customer customerDetails;
 
-    public ShoppingCart(int orderID, Store store, LocalDate orderDateRequested, double distance) {
+    public ShoppingCart(int orderID, Store store, LocalDate orderDateRequested, Customer customer) {
         this.orderID = orderID;
-        cartItem = /*new HashMap<>();*/new LinkedList<>();
+        cartItem = new LinkedList<>();
         orderDate = orderDateRequested;
-        distanceFromStore = distance;
-        deliveryCost = distance*store.getPricePerKilometer();
+        distanceFromStore = calculateDistance(store.getLocation(), customer.getLocation());
+        deliveryCost = distanceFromStore*store.getPricePerKilometer();
         storeDetails = store;
+        customerDetails = customer;
+    }
+
+    private double calculateDistance(Location storeLocation, Location userLocation) {
+        double a = storeLocation.getX() - userLocation.getX();
+        double b = storeLocation.getY() - userLocation.getY();
+        double powA = Math.pow(a, 2);
+        double powB = Math.pow(b, 2);
+
+        return Math.sqrt(powA + powB);
     }
 
     public Store getStoreDetails(){
@@ -67,7 +80,7 @@ public class ShoppingCart {
         return new ShoppingCartDTO(orderID, orderDate, cartDTO, deliveryCost, distanceFromStore,
                 new StoreDTO(storeDetails.getOwnerName(), storeDetails.getStoreName(), storeDetails.getID(),
                         new Point(storeDetails.getLocation().getX(), storeDetails.getLocation().getY()),
-                        null, storeDetails.getPricePerKilometer(), null, null, storeDetails.getTotalDeliveriesRevenues()));
+                        null, storeDetails.getPricePerKilometer(), null, null, storeDetails.getTotalDeliveriesRevenues()), customerDetails.createCustomerDTO());
     }
 
     public int getOrderID(){

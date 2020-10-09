@@ -62,21 +62,14 @@ public class ZoneManager {
         tempDeservedSales = new LinkedList<>();
     }
 
-    public void createShoppingCart(int storeID, Point userLocation) {
+    public void createShoppingCart(int storeID, Customer customer) {
         Store store = storesById.get(storeID);
-        double distance = calculateDistance(store.getLocation(), userLocation);
-        tempOrder.addNewShoppingCart(store, distance);
+//        double distance = calculateDistance(store.getLocation(), customer.getLocation());
+        tempOrder.addNewShoppingCart(store, customer);
         //tempOrder = new Order(storeID, store.getName(), orderDateRequested, distance, store.getPricePerKilometer());
     }
 
-    private double calculateDistance(Location storeLocation, Point userLocation) {
-        double a = storeLocation.getX() - userLocation.getX();
-        double b = storeLocation.getY() - userLocation.getY();
-        double powA = Math.pow(a, 2);
-        double powB = Math.pow(b, 2);
 
-        return Math.sqrt(powA + powB);
-    }
 
     public void addStore(Store store) {
 
@@ -415,13 +408,13 @@ public class ZoneManager {
         pairListStoreAndAvgPricePerItem.put(serialNumber, new Pair<>(listStoreAndPricePair.getKey(), newAvgPrice));
     }
 
-    public void createMinOrderFromItemList(LocalDate orderDateRequested, Point userLocation, HashMap<Integer, Double> itemList) {
+    public void createMinOrderFromItemList(LocalDate orderDateRequested, Customer customer, HashMap<Integer, Double> itemList) {
         int storeID;
         createOrder(orderDateRequested);
         for (Integer serialNumber : itemList.keySet()) {
             storeID = getStoreIDOfMinPriceOfItem(serialNumber);
             if (!tempOrder.getShoppingCarts().containsKey(storeID)) {
-                createShoppingCart(storeID, userLocation);
+                createShoppingCart(storeID, customer);
             }
 
             addItemToCartFromStore(storeID, serialNumber, itemList.get(serialNumber));
@@ -477,13 +470,13 @@ public class ZoneManager {
         return result;
     }
 
-    public double calculateDeliveryCost(StoreDTO store, CustomerDTO customer) {
+    /*public double calculateDeliveryCost(StoreDTO store, CustomerDTO customer) {
         return store.getPricePerKilometer() * (calculateDistance(new Location(store.getLocation()), customer.getLocation()));
-    }
+    }*/
 
-    public void createOrderFromItemList(LocalDate date, int storeID, Point userLocation, HashMap<Integer, Double> itemsList) {
+    public void createOrderFromItemList(LocalDate date, int storeID, Customer customer, HashMap<Integer, Double> itemsList) {
         createOrder(date);
-        createShoppingCart(storeID, userLocation);
+        createShoppingCart(storeID, customer);
         for (Map.Entry<Integer, Double> entry : itemsList.entrySet()) {
             addItemToCartFromStore(storeID, entry.getKey(), entry.getValue());
         }

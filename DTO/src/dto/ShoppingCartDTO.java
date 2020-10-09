@@ -12,15 +12,30 @@ public class ShoppingCartDTO {
     private double distanceFromStore;
     private LocalDate orderDate;
     private StoreDTO storeDetails;
+    private int TotalItemAmount;
+    private double TotalItemsPrice;
+    private String storeName;
+    private int storeID;
+    private String customerName;
+    private int customerXCoordinate;
+    private int customerYCoordinate;
+
 
     public ShoppingCartDTO(int orderID, LocalDate orderDate, List<ShoppingCartItemDTO> shoppingCart, double deliveryCost,
-                           double distanceFromStore, StoreDTO storeDetails) {
+                           double distanceFromStore, StoreDTO storeDetails, CustomerDTO customer) {
         this.orderID = orderID;
         this.shoppingCart = shoppingCart;
         this.deliveryCost = deliveryCost;
         this.distanceFromStore = distanceFromStore;
         this.orderDate = orderDate;
         this.storeDetails = storeDetails;
+        TotalItemAmount = getTotalItemsAmount();
+        TotalItemsPrice = getTotalItemsPrice();
+        storeName = storeDetails.getStoreName();
+        storeID = storeDetails.getId();
+        customerName = customer.getName();
+        customerXCoordinate = customer.getLocation().x;
+        customerYCoordinate = customer.getLocation().y;
     }
 
     public String getStoreName(){

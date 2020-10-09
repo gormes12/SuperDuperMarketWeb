@@ -45,6 +45,7 @@ public class UploadFileServlet extends HttpServlet {
             }
 
             SequenceInputStream fileInputStream =  new SequenceInputStream(Collections.enumeration(fileInputStreamList));
+                PrintWriter out = response.getWriter();
 
             try {
                 synchronized (getServletContext()) {
@@ -52,15 +53,16 @@ public class UploadFileServlet extends HttpServlet {
                     systemManager.addZone(zoneManager.getZoneName(), zoneManager);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                return;
+//                response.setProperty(response.HTTP_STATUS_CODE, "500");
+                response.setStatus(500);
+                out.print(e.getMessage());
+                out.flush();
             }
         } else {
             return;
         }
 
-        /*PrintWriter out = response.getWriter();
-        out.print("");*/
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

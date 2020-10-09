@@ -6,6 +6,7 @@ import dto.ShoppingCartDTO;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import my.project.item.ShoppingCartItem;
 import my.project.store.Store;
+import my.project.user.Customer;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -26,10 +27,11 @@ public class Order {
         orderDate = orderDateRequested;
     }
 
-    public void addNewShoppingCart(Store store, double distanceFromStore){
+    public void addNewShoppingCart(Store store, Customer customer){
         if(!shoppingCarts.containsKey(store.getID())){
-            shoppingCarts.put(store.getID(), new ShoppingCart(orderID, store, orderDate, distanceFromStore));
-            addTotalDeliveryCost(store.getPricePerKilometer() * distanceFromStore);
+            ShoppingCart shoppingCart = new ShoppingCart(orderID, store, orderDate, customer);
+            shoppingCarts.put(store.getID(), shoppingCart);
+            addTotalDeliveryCost(shoppingCart.getDeliveryCost());
         }else{
             throw new ValueException("You already have an active order from this store.");
         }

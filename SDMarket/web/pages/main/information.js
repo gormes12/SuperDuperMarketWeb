@@ -4,13 +4,15 @@ var USER_LIST_URL = buildUrlWithContextPath("userslist");
 var USER_TYPE_URL = buildUrlWithContextPath("usertype");
 var UPLOAD_FILE_URL = buildUrlWithContextPath("uploadfile");
 var ZONE_LIST_URL = buildUrlWithContextPath("zones");
+var PASS_SCREEN = buildUrlWithContextPath("passScreen");
 
 $(function() {
     ajaxUsersList();
+    triggerAjaxZonesContent();
+
     //The users list is refreshed automatically every second
     setInterval(ajaxUsersList, refreshRate);
-
-    triggerAjaxZonesContent();
+    initChooseZone();
 });
 
 function triggerAjaxZonesContent() {
@@ -28,14 +30,20 @@ function ajaxZonesContent() {
              {
                 "entries": [
                     {
-                        "chatString":"Hi",
-                        "username":"bbb",
-                        "time":1485548397514
+                        "avgOrderPrice": 0,
+                        "ownerName": "maorgo",
+                        "totalItemType": 10,
+                        "totalOrders": 0,
+                        "totalStores": 4,
+                        "zoneName": "Hasharon"
                     },
                     {
-                        "chatString":"Hello",
-                        "username":"bbb",
-                        "time":1485548397514
+                        "avgOrderPrice": 0,
+                        "ownerName": "maorgo",
+                        "totalItemType": 5,
+                        "totalOrders": 0,
+                        "totalStores": 2,
+                        "zoneName": "Galil Maarvi"
                     }
                 ],
                 "version":1
@@ -57,19 +65,49 @@ function ajaxZonesContent() {
 //entries = the added chat strings represented as a single string
 function appendToZonesInfo(entries) {
     var zonesInfo = $("#zone-info");
-
+    if (zonesVersion === entries.length){
+        zonesInfo.empty();
+    }
     // add the relevant entries
     $.each(entries || [], function (index, entry) {
-        $("<div class=\"w3-quarter w3-Light-Blue\">" +
-            "<div class=\"w3-card w3-container w3-round-xlarge\">" +
-            "<h3 class=\"w3-center\">" + entry.zoneName + "</h3><br>" +
-            "  <p> Owner: " + entry.ownerName + "</p>" +
-            "  <p> Total Item Type: " + entry.totalItemType + "</p>" +
-            "  <p> Total Stores: " + entry.totalStores + "</p>" +
-            "  <p> Total Orders: " + entry.totalOrders + "</p>" +
-            "  <p> Average Order Price: " + entry.avgOrderPrice + "</p>" +
-            "  </div>" +
-            "  </div>").appendTo(zonesInfo);
+        $("<div class=\"w3-quarter w3-margin\">" +
+                "<div class=\"w3-card w3-container w3-round-xlarge w3-light-blue\">" +
+                    "<h3 class=\"w3-center\">" + entry.zoneName + "</h3><br>" +
+                    "<p> Owner: " + entry.ownerName + "</p>" +
+                    "<p> Total Item Type: " + entry.totalItemType + "</p>" +
+                    "<p> Total Stores: " + entry.totalStores + "</p>" +
+                    "<p> Total Orders: " + entry.totalOrders + "</p>" +
+                    "<p> Average Order Price: " + entry.avgOrderPrice + "</p>" +
+                    "<form action='passScreen' method='post' class='pass-screen'>" +
+                        "<input name='chooseZone' value=\"" + entry.zoneName + "\" style='display: none'/>" +
+                        "<input type='submit' value='Enter'/>" +
+                    "</form>" +
+                "</div>" +
+        "</div>").appendTo(zonesInfo);
+    });
+}
+
+function initChooseZone(){
+    $(".pass-screen").submit(function() {
+        var parameters = $(this).serialize();
+
+        $.ajax({
+            method: 'POST',
+            data: parameters,
+            url: PASS_SCREEN,
+            timeout: 2000,
+            error: function(res) {
+                // console.error("Failed to submit");
+                // $("#message-upload-file-label").text("File Error:\n" + res.responseText).addClass("w3-red").toggleClass("w3-green");
+            },
+            success: function(res) {
+                //$("#message-upload-file-label").text("File Successfully Uploaded").toggleClass("w3-red").addClass("w3-green").toggleClass("w3-red");
+            }
+        });
+
+        //$("#userstring").val("");
+        // by default - we'll always return false so it doesn't redirect the user.
+        return false;
     });
 }
 
@@ -116,13 +154,12 @@ $(function () {
             processData: false,
             contentType: false,
             timeout: 4000,
-            error: function() {
-                console.error("Failed to submit");
+            error: function(res) {
+                // console.error("Failed to submit");
+                $("#message-upload-file-label").text("File Error:\n" + res.responseText).addClass("w3-red").toggleClass("w3-green");
             },
-            success: function(r) {
-                //do not add the user string to the chat area
-                //since it's going to be retrieved from the server
-                //$("#result h1").text(r);
+            success: function(res) {
+                $("#message-upload-file-label").text("File Successfully Uploaded").toggleClass("w3-red").addClass("w3-green").toggleClass("w3-red");
             }
         });
 

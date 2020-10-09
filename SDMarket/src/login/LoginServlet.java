@@ -13,7 +13,7 @@ import java.io.IOException;
 @WebServlet(name = "LoginServlet", urlPatterns = {"/pages/login"})
 public class LoginServlet extends HttpServlet {
 
-    private final String CHAT_ROOM_URL = "main/zones.html";  //"../index.html";   //""../chatroom/chatroom.html";
+    private final String INFORMATION_URL = "main/information.html";  //"../index.html";   //""../chatroom/chatroom.html";
     private final String SIGN_UP_URL = "";   //"../signup/signup.html";
     private final String LOGIN_ERROR_URL = "/pages/login_attempt_after_error.jsp";  // must start with '/' since will be used in request dispatcher...
 
@@ -70,13 +70,13 @@ public class LoginServlet extends HttpServlet {
 
                         //redirect the request to the chat room - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());
-                        response.sendRedirect(CHAT_ROOM_URL);
+                        response.sendRedirect(INFORMATION_URL);
                     }
                 }
             }
         } else {
             //user is already logged in
-            response.sendRedirect(CHAT_ROOM_URL);
+            response.sendRedirect(INFORMATION_URL);
         }
     }
 

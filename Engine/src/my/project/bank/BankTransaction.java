@@ -1,8 +1,10 @@
 package my.project.bank;
 
+import dto.BankTransactionsDTO;
+
 import java.time.LocalDate;
 
-public class BankAction {
+public class BankTransaction {
 
     public enum eActionType{
         Withdrawal,
@@ -16,8 +18,8 @@ public class BankAction {
     private final double creditBalanceBefore;
     private final double creditBalanceAfter;
 
-    public BankAction(eActionType type, LocalDate date, double amount,
-                      double creditBalanceBefore, double creditBalanceAfter){
+    public BankTransaction(eActionType type, LocalDate date, double amount,
+                           double creditBalanceBefore, double creditBalanceAfter){
         this.type = type;
         this.date = date;
         this.amount = amount;
@@ -43,6 +45,10 @@ public class BankAction {
 
     public double getCreditBalanceAfter() {
         return creditBalanceAfter;
+    }
+
+    public BankTransactionsDTO createBankTransactionsDTO(){
+        return new BankTransactionsDTO(type.toString(), date, amount, creditBalanceBefore, creditBalanceAfter);
     }
 
 }

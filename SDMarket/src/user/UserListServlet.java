@@ -2,6 +2,7 @@ package user;
 
 import com.google.gson.Gson;
 import my.project.manager.SystemManager;
+import my.project.manager.UserManager;
 import my.project.user.User;
 import utils.ServletUtils;
 
@@ -23,8 +24,8 @@ public class UserListServlet extends HttpServlet {
         response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
-            SystemManager systemManager = ServletUtils.getSystemManager(getServletContext());
-            Collection<User> usersList = systemManager.getUsers();
+            UserManager userManager = ServletUtils.getSystemManager(getServletContext()).getUserManager();
+            Collection<User> usersList = userManager.getUsers();
             String json = gson.toJson(usersList);
             out.println(json);
             out.flush();

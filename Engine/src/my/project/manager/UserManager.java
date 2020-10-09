@@ -46,4 +46,12 @@ public class UserManager {
             throw new ValueException("Username " + username + " does not exist");
         }
     }
+
+    public synchronized User getUser(String username) {
+        if(isUserExists(username)){
+            return users.get(username);
+        } else {
+            throw new ValueException("Username " + username + " does not exist");
+        }
+    }
 }
