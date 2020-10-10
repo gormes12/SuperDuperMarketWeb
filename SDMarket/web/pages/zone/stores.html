@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="../../common/jquery-2.0.3.min.js"></script>
+    <script src="../../common/context-path-helper.js"></script>
+    <script src="stores.js"></script>
+
+    <title>Super Duper Market</title>
+    <script>
+        // Side navigation
+        function w3_open() {
+            document.getElementById("main").style.marginLeft = "15%";
+            document.getElementById("mySidebar").style.width = "15%";
+            document.getElementById("mySidebar").style.display = "block";
+            document.getElementById("openNav").style.display = 'none';
+        }
+        function w3_close() {
+            document.getElementById("main").style.marginLeft = "0%";
+            document.getElementById("mySidebar").style.display = "none";
+            document.getElementById("openNav").style.display = "inline-block";
+        }
+    </script>
+    <script>
+        /*var slideIndex = 1;
+        showDivs(slideIndex);
+
+        function plusDivs(n) {
+            showDivs(slideIndex += n);
+        }
+
+        function currentDiv(n) {
+            showDivs(slideIndex = n);
+        }
+
+        function showDivs(n) {
+            var i;
+            var x = document.getElementsByClassName("mySlides");
+            var dots = document.getElementsByClassName("demo");
+            if (n > x.length) {slideIndex = 1}
+            if (n < 1) {slideIndex = x.length}
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" w3-white", "");
+            }
+            x[slideIndex-1].style.display = "block";
+            dots[slideIndex-1].className += " w3-white";
+        }*/
+    </script>
+</head>
+<style>
+    .mySlides {display:none}
+    .w3-left, .w3-right, .w3-badge {cursor:pointer}
+    .w3-badge {height:13px;width:13px;padding:0}
+</style>
+<body>
+<!-- Side Navigation -->
+<div class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-center" style="display:none" id="mySidebar">
+    <button class="w3-bar-item w3-button" onclick="w3_close()">Close &times;<!--<i class="fa fa-remove"></i>--></button>
+    <a href="../main/information.html" class="w3-bar-item w3-button">Info & Zones</a>
+    <a href="../main/BankAccount.html" class="w3-bar-item w3-button">Bank Account</a>
+    <a href="../../logout" class="w3-bar-item w3-button">Logout</a>
+</div>
+
+<!-- Header -->
+<header class="w3-container w3-theme w3-padding w3-dark-grey" id="myHeader">
+    <button id="openNav" class="w3-button w3-xlarge" onclick="w3_open()">&#9776;</button>
+    <!--<i onclick="w3_open()" class="fa fa-bars w3-xlarge w3-button w3-theme"></i>-->
+    <div class="w3-center">
+        <h3 class="w3-xxxlarge w3-animate-bottom">Super Duper Market</h3>
+        <p>The perfect place for your shopping!</p>
+    </div>
+</header>
+<div class="w3-container" id="main">
+    <div id="tabs-row" class="w3-row">
+        <a href="javascript:void(0)" onclick="openTab(event, 'transactions');">
+            <div class="w3-quarter tablink w3-bottombar w3-hover-light-grey w3-padding w3-border-red" style="width:200px">Items & Stores</div>
+        </a>
+    </div>
+
+<!------   common tab for customer & Store Owner ------>
+
+    <div id="itemsAndStores" class="tab-option" >
+        <div class="w3-row w3-content w3-center" id="items">
+            <div class="w3-content w3-display-container w3-cell-middle" id="items-info">
+
+            </div>
+            <div class="w3-center w3-container w3-section w3-large w3-text-dark-grey w3-cell-bottommiddle" style="width:100%">
+                <div class="w3-left w3-hover-text-khaki" onclick="plusDivs(-1)">&#10094;</div>
+                <div class="w3-right w3-hover-text-khaki" onclick="plusDivs(1)">&#10095;</div>
+                <div class="scroll">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="w3-row w3-content w3-center" id="zone-stores" >
+
+        </div>
+    </div>
+
+    <!------------------------------>
+
+  <!------ tab option for Store Owner ------>
+
+        <!------ order details tab option ------>
+    <div id="order-details" class="tab-option" style="display:none">
+        <div class="w3-row">
+            <form action="" id="ShowOrderDetailsForm">
+                <label for="stores">Choose a store:</label>
+                <select class="w3-round" name="stores" id="stores">
+
+                </select>
+                <br><br>
+                <input type="submit" value="Show Details">
+            </form>
+        </div>
+        <div class="w3-row">
+            <div id="order-details-table">
+
+            </div>
+            <div id="items-order-details">
+
+            </div>
+        </div>
+    </div>
+
+        <!------ feedback details tab option ------>
+    <div id="feedback-details" class="tab-option" style="display:none">
+
+    </div>
+
+    <!------ open new store tab option ------>
+    <div id="open-new-store" class="tab-option" style="display:none">
+
+    </div>
+
+            <!------------------------------>
+
+ <!------ tab option for Customer ------>
+
+    <!------ make Order tab option ------>
+
+    <div id="make-order" class="tab-option" >
+        <form class="w3-container w3-card-4 w3-light-grey" style="max-width: 400px" method="get" action="order" id="orderform">
+
+            <p>
+                <label>Pick a date</label>
+                <input style="max-width: 200px" class="w3-input w3-border w3-round" type="date" id="date-to-order" name="date-to-order" min="2020-01-01" required>
+            </p>
+            <p>
+                <label>Location</label><br>
+                <label>X:</label>
+                <!--class="w3-input"-->
+                <input  id="xCoordinate" name="xCoordinate" type="number" step="1" min="1" max="50" required>
+                <label>Y:</label>
+                <input id="yCoordinate" name="yCoordinate" type="number" step="1" min="1" max="50" required>
+            </p>
+            <p>
+                <label>Order Type</label><br>
+                <input type="radio" name="order-type" value="static" onclick="showStoresForStaticOrder()">
+                <label>Static Order</label>
+                <input type="radio" name="order-type" value="dynamic" checked onclick="hideStoresForStaticOrder()">
+                <label>Dynamic Order</label>
+            </p>
+
+
+            <p>
+                <div id="stores-for-static-order">
+
+                </div>
+            </p>
+            <p>
+                <label id="error-screen-one-order-label"></label>
+            </p>
+            <p class="w3-cell-bottommiddle">
+                <button  type="submit" style="border:none ;background:transparent"> <i class="material-icons w3-xxlarge ">arrow_forward</i></button>
+            </p>
+        </form>
+    </div>
+
+
+</div>
+
+</body>
+</html>
