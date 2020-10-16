@@ -7,47 +7,49 @@ import java.util.List;
 
 public class ShoppingCartDTO {
     private final int orderID;
-    private List<ShoppingCartItemDTO> shoppingCart;
+    private List<ShoppingCartItemDTO> items;
     private double deliveryCost;
     private double distanceFromStore;
     private LocalDate orderDate;
-    private StoreDTO storeDetails;
+//    private StoreDTO storeDetails;
     private int TotalItemAmount;
     private double TotalItemsPrice;
     private String storeName;
     private int storeID;
+    private double storePPK;
     private String customerName;
     private int customerXCoordinate;
     private int customerYCoordinate;
 
 
-    public ShoppingCartDTO(int orderID, LocalDate orderDate, List<ShoppingCartItemDTO> shoppingCart, double deliveryCost,
-                           double distanceFromStore, StoreDTO storeDetails, CustomerDTO customer) {
+    public ShoppingCartDTO(int orderID, LocalDate orderDate, List<ShoppingCartItemDTO> items, double deliveryCost,
+                           double distanceFromStore, StoreDTO storeDetails, String customerName, Point customerLocation) {
         this.orderID = orderID;
-        this.shoppingCart = shoppingCart;
+        this.items = items;
         this.deliveryCost = deliveryCost;
         this.distanceFromStore = distanceFromStore;
         this.orderDate = orderDate;
-        this.storeDetails = storeDetails;
+//        this.storeDetails = storeDetails;
         TotalItemAmount = getTotalItemsAmount();
         TotalItemsPrice = getTotalItemsPrice();
         storeName = storeDetails.getStoreName();
         storeID = storeDetails.getId();
-        customerName = customer.getName();
-        customerXCoordinate = customer.getLocation().x;
-        customerYCoordinate = customer.getLocation().y;
+        this.customerName = customerName;
+        customerXCoordinate = customerLocation.x;
+        customerYCoordinate = customerLocation.y;
+        storePPK = storeDetails.getPricePerKilometer();
     }
 
     public String getStoreName(){
-        return storeDetails.getStoreName();
+        return storeName;
     }
 
     public int getStoreID(){
-        return storeDetails.getId();
+        return storeID;
     }
 
-    public List<ShoppingCartItemDTO> getShoppingCart() {
-        return shoppingCart;
+    public List<ShoppingCartItemDTO> getItems() {
+        return items;
     }
 
     public double getDeliveryCost() {
@@ -55,7 +57,7 @@ public class ShoppingCartDTO {
     }
 
     public double getPricePerKilometer() {
-        return storeDetails.getPricePerKilometer();
+        return storePPK;
     }
 
     public double getDistanceFromStore() {
@@ -67,17 +69,17 @@ public class ShoppingCartDTO {
     }
 
     public int getTotalItemTypes(){
-        return shoppingCart.size();
+        return items.size();
     }
 
-    public Point getLocation(){
-        return storeDetails.getLocation();
-    }
+//    public Point getLocation(){
+//        return storeDetails.getLocation();
+//    }
 
     public int getTotalItemsAmount() {
         int sum = 0;
 
-        for (ShoppingCartItemDTO item : shoppingCart) {
+        for (ShoppingCartItemDTO item : items) {
             if (item.getPurchaseCategory().equals("Quantity")) {
                 sum += item.getAmount();
             } else {
@@ -91,7 +93,7 @@ public class ShoppingCartDTO {
     public double getTotalItemsPrice() {
         double sum = 0;
 
-        for (ShoppingCartItemDTO item : shoppingCart) {
+        for (ShoppingCartItemDTO item : items) {
             sum += item.getTotalPrice();
         }
 
@@ -102,9 +104,9 @@ public class ShoppingCartDTO {
         return orderID;
     }
 
-    public StoreDTO getStoreDetails() {
-        return storeDetails;
-    }
+//    public StoreDTO getStoreDetails() {
+//        return storeDetails;
+//    }
 
     public double getOrderCost() {
         return getTotalItemsPrice()+deliveryCost;
@@ -117,8 +119,8 @@ public class ShoppingCartDTO {
                 System.lineSeparator(),
                 orderID,
                 orderDate,
-                storeDetails.getId(),
-                storeDetails.getStoreName(),
+                storeID,
+                storeName,
                 getTotalItemTypes(),
                 getTotalItemsAmount(),
                 String.format("%.2f",getTotalItemsPrice()),

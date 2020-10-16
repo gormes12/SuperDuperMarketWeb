@@ -1,8 +1,12 @@
 package order;
 
 import com.google.gson.Gson;
+import dto.ItemDTO;
 import dto.ShoppingCartDTO;
+import dto.SuperMarketItemDTO;
+import my.project.location.Location;
 import my.project.manager.ZoneManager;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -13,10 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
-@WebServlet(name = "HistoryOrdersServlet", urlPatterns = {"/historyOrders"})
-public class HistoryOrdersServlet extends HttpServlet {
+@WebServlet(name = "MakeOrderScOneServlet", urlPatterns = {"/makeOrderScOne"})
+public class MakeOrderScOneServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -34,21 +40,56 @@ public class HistoryOrdersServlet extends HttpServlet {
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
 
+        try (PrintWriter out = response.getWriter()) {
+
+
+            int xCoordinate = Integer.parseInt(request.getParameter("xCoordinate"));
+            int yCoordinate = Integer.parseInt(request.getParameter("yCoordinate"));
+
+            Location location = new Location(xCoordinate, yCoordinate);
+            if (zoneManager.isLocationCaughtUp(location)) {
+                response.setStatus(500);
+                out.print("This location caught up by store and you can't insert this location");
+                out.flush();
+            } else {
+                request.getSession(false).setAttribute(ConstantsUtils.CURRENT_LOCATION, location);
+            }
+
         /*
         Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
-        int storeID = Integer.parseInt(request.getParameter("stores"));
-        List<ShoppingCartDTO> ordersEntries;
-        synchronized (getServletContext()) {
-            ordersEntries = zoneManager.getShoppingCartsOfStore(storeID);
-        }
+            LocalDate date = LocalDate.parse(request.getParameter("date-to-order"));
+            request.getSession(false).setAttribute(ConstantsUtils.DATE_ORDER, date);
 
-        // log and create the response json string
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(ordersEntries);
+            //create shopping cart
+            request.getSession(false).setAttribute(ConstantsUtils.CURRENT_SHOPPING_CART, new HashMap<>());
 
-        try (PrintWriter out = response.getWriter()) {
+
+            Gson gson = new Gson();
+            String jsonResponse;
+
+            if (request.getParameter("order-type").equals("static")) {
+                request.getSession(false).setAttribute(ConstantsUtils.CURRENT_TYPE_ORDER, "static");
+                int storeID = Integer.parseInt(request.getParameter("chosenStore"));
+                request.getSession(false).setAttribute(ConstantsUtils.CHOSEN_STORE_FOR_STATIC_ORDER, storeID);
+
+                List<SuperMarketItemDTO> itemsEntries;
+                synchronized (getServletContext()) {
+                    itemsEntries = zoneManager.getAvailableItemFrom(storeID);
+                }
+                // create the response json string
+                jsonResponse = gson.toJson(itemsEntries);
+            } else {
+                request.getSession(false).setAttribute(ConstantsUtils.CURRENT_TYPE_ORDER, "dynamic");
+                List<ItemDTO> itemsEntries;
+                synchronized (getServletContext()) {
+                    itemsEntries = zoneManager.getItems();
+                }
+
+                jsonResponse = gson.toJson(itemsEntries);
+            }
+
             out.print(jsonResponse);
             out.flush();
         }

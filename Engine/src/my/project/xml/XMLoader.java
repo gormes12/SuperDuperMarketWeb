@@ -58,7 +58,7 @@ public class XMLoader {
                 String itemName = zoneManager.getNameOfItem(details.getItemId());
                 detailsList.add(new SaleDetails(itemName, details.getItemId(), details.getQuantity(), details.getForAdditional()));
             }
-            zoneManager.addSaleToStore(storeID,discount.getName(), discount.getIfYouBuy().getItemId(), discount.getIfYouBuy().getQuantity(),
+            zoneManager.addSaleToStore(storeID,discount.getName(), zoneManager.getNameOfItem(discount.getIfYouBuy().getItemId()), discount.getIfYouBuy().getItemId(), discount.getIfYouBuy().getQuantity(),
                     discount.getThenYouGet().getOperator(), detailsList);
         }
     }

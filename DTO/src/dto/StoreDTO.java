@@ -15,7 +15,7 @@ public class StoreDTO {
     private final List<SaleDTO> sales;
     private final List<ShoppingCartDTO> orders;
     private final double totalDeliveriesRevenues;
-    private final double totalItemsSoldRevenues;
+    private double totalItemsSoldRevenues;
     private final int xCoordinate;
     private final int yCoordinate;
 
@@ -39,7 +39,9 @@ public class StoreDTO {
         this.sales = sales;
         this.orders = orders;
         totalDeliveriesRevenues = deliveriesRevenues;
-        totalItemsSoldRevenues = calculateItemsSoldRevenues(orders);
+        if (orders!=null) {
+            totalItemsSoldRevenues = calculateItemsSoldRevenues(orders);
+        }
     }
 
     private double calculateItemsSoldRevenues(List<ShoppingCartDTO> orders) {

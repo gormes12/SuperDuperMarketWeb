@@ -80,7 +80,8 @@ public class ShoppingCart {
         return new ShoppingCartDTO(orderID, orderDate, cartDTO, deliveryCost, distanceFromStore,
                 new StoreDTO(storeDetails.getOwnerName(), storeDetails.getStoreName(), storeDetails.getID(),
                         new Point(storeDetails.getLocation().getX(), storeDetails.getLocation().getY()),
-                        null, storeDetails.getPricePerKilometer(), null, null, storeDetails.getTotalDeliveriesRevenues()), customerDetails.createCustomerDTO());
+                        null, storeDetails.getPricePerKilometer(), null, null, storeDetails.getTotalDeliveriesRevenues()),
+                customerDetails.getUsername(),  new Point(customerDetails.getLocation().getX(), customerDetails.getLocation().getY()));
     }
 
     public int getOrderID(){

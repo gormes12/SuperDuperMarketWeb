@@ -12,12 +12,14 @@ public class OrderDTO {
     private List<ShoppingCartDTO> shoppingCarts;
     private double deliveryCost;
     private LocalDate orderDate;
+    private double totalOrderPrice;
 
     public OrderDTO(int orderID, LocalDate orderDate, List<ShoppingCartDTO> shoppingCart, double deliveryCost) {
         this.orderID = orderID;
         this.shoppingCarts = shoppingCart;
         this.deliveryCost = deliveryCost;
         this.orderDate = orderDate;
+        totalOrderPrice = getOrderCost();
     }
 
     public List<ShoppingCartDTO> getShoppingCarts() {

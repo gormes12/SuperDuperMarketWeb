@@ -9,64 +9,111 @@ import java.util.Objects;
 
 public class SaleDTO {
 
-    private final String saleName;
-    private final int belongToStoreID;
-    private final Pair<Integer, Double> conditionSale;
-    private final Pair<String, List<SaleDetailsDTO>> details;
+    private String saleName;
+    private int belongToStoreID;
+    private String operator;
+    private Pair<Integer, Double> conditionSale;
+    private int conditionSaleItemID;
+    private double conditionSaleAmount;
+    private String saleItemName;
+    private String conditionSaleInString;
+    private List<SaleDetailsDTO> details;
+    private List<String> saleDetailsInListString;
+    private String youDeserveSentence;
 
-    public SaleDTO(String saleName, Pair<Integer, Double> conditionSale, Pair<String, List<SaleDetailsDTO>> details, int belongToStoreID) {
+    public SaleDTO(){
+
+    }
+
+    public SaleDTO(String saleName, String saleItemName, Pair<Integer, Double> conditionSale, Pair<String, List<SaleDetailsDTO>> details, int belongToStoreID) {
         this.saleName = saleName;
+        this.saleItemName = saleItemName;
         this.conditionSale = conditionSale;
-        this.details = details;
+        this.details = details.getValue();
         this.belongToStoreID = belongToStoreID;
+        conditionSaleInString = convertConditionToString();
+        saleDetailsInListString = convertSaleDetailsToStrings();
+        operator = details.getKey();
+        youDeserveSentence = createYouDeserveSentence();
+        conditionSaleItemID = conditionSale.getKey();
+        conditionSaleAmount = conditionSale.getValue();
+    }
+
+    public void setBelongToStoreID(int belongToStoreID) {
+        this.belongToStoreID = belongToStoreID;
+    }
+
+    public void setConditionSale(Pair<Integer, Double> conditionSale) {
+        this.conditionSale = conditionSale;
+    }
+
+    public void setConditionSaleInString(String conditionSaleInString) {
+        this.conditionSaleInString = conditionSaleInString;
+    }
+
+    public void setDetails(List<SaleDetailsDTO> details) {
+        this.details = details;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public void setSaleDetailsInListString(List<String> saleDetailsInListString) {
+        this.saleDetailsInListString = saleDetailsInListString;
+    }
+
+    public void setSaleItemName(String saleItemName) {
+        this.saleItemName = saleItemName;
+    }
+
+    public void setSaleName(String saleName) {
+        this.saleName = saleName;
+    }
+
+    public void setYouDeserveSentence(String youDeserveSentence) {
+        this.youDeserveSentence = youDeserveSentence;
+    }
+
+    public String getSaleItemName() {
+        return saleItemName;
     }
 
     public Pair<Integer, Double> getConditionSale() {
         return conditionSale;
     }
 
-    public Pair<String, List<SaleDetailsDTO>> getDetails() {
+    public List<SaleDetailsDTO> getDetails() {
         return details;
     }
 
     public String convertConditionToString(){
-        return MessageFormat.format("Buy {0} from item id: {1}", conditionSale.getKey(), conditionSale.getValue());
+        return MessageFormat.format("You Bought {0} {2} of {3} (Serial No. {1})", conditionSale.getKey(), conditionSale.getValue(),conditionSale.getKey() == 1? "unit" : "units", saleItemName);
     }
 
     public String getOperator(){
-        return details.getKey();
+        return operator;
     }
 
-    /*public String convertSaleDetailsToString(){
-        String saleDetails = "And get ";
-        if(details.getKey().equals("IRRELEVANT")) {
-            SaleDetailsDTO saleItem = details.getValue().get(0);
-            saleDetails = saleDetails.concat(MessageFormat.format("{0} from item id: {1} for {2} SHEKEL per unit.",
-                    saleItem.getQuantity(), saleItem.getItemSerialNumber(), saleItem.getAdditionalChargePerUnit()));
-        }else if(details.getKey().equals("ONE-OF")){
-            for(SaleDetailsDTO saleItem : details.getValue()) {
-                saleDetails = saleDetails.concat(MessageFormat.format("{0} from item id: {1} for {2} SHEKEL per unit ",
-                        saleItem.getQuantity(), saleItem.getItemSerialNumber(), saleItem.getAdditionalChargePerUnit()));
-                if(saleItem!=details.getValue().get(details.getValue().size() - 1)){
-                    saleDetails = saleDetails.concat("Or get ");
-                }
-            }
-        }else{
-            double sum;
+    private String createYouDeserveSentence(){
+        if (operator.equals("ONE-OF")){
+            return ("You deserve to execute one of the following:");
+        } else if (operator.equals("ALL-OR-NOTHING")){
+            return ("You deserve to execute all the following:");
+        } else {
+            return ("You deserve to execute:");
         }
-
-        return saleDetails;
-    }*/
+    }
 
     public List<String> convertSaleDetailsToStrings(){
-        List<String> saleDetails =  new LinkedList<>(); //"And get ";
-        saleDetails.add("And Get");
+        List<String> saleDetails =  new LinkedList<>();
 
-        for(SaleDetailsDTO saleItem : details.getValue()) {
-            saleDetails.add(MessageFormat.format("{0} {3} from item id: {1} for {2}",
+        for(SaleDetailsDTO saleItem : details) {
+            saleDetails.add(MessageFormat.format("{0} {3} of {4} ( Serial No. {1} ) for {2}",
                     saleItem.getQuantity(), saleItem.getItemSerialNumber(),
-                    saleItem.getAdditionalChargePerUnit() == 0? "free" : String.format("%.2f",saleItem.getAdditionalChargePerUnit()) + " SHEKEL per unit",
-                    saleItem.getQuantity() ==1? "unit" : "units"));
+                    saleItem.getAdditionalChargePerUnit() == 0? "free" : String.format("%.2f",saleItem.getAdditionalChargePerUnit()) + " ₪ per unit",
+                    saleItem.getQuantity() ==1? "unit" : "units",
+                    saleItem.getItemName()));
         }
 
         return saleDetails;
@@ -77,7 +124,7 @@ public class SaleDTO {
     }
 
     public SaleDetailsDTO getSpecificSaleDetailsOnItemFromSale(int itemSerialNumber){
-        for(SaleDetailsDTO saleDetails : details.getValue()){
+        for(SaleDetailsDTO saleDetails : details){
             if(saleDetails.getItemSerialNumber() == itemSerialNumber){
                 return saleDetails;
             }
@@ -106,5 +153,33 @@ public class SaleDTO {
     @Override
     public int hashCode() {
         return Objects.hash(saleName, belongToStoreID, conditionSale, details);
+    }
+
+    public String getConditionSaleInString() {
+        return conditionSaleInString;
+    }
+
+    public List<String> getSaleDetailsInListString() {
+        return saleDetailsInListString;
+    }
+
+    public String getYouDeserveSentence() {
+        return youDeserveSentence;
+    }
+
+    public int getConditionSaleItemID() {
+        return conditionSaleItemID;
+    }
+
+    public void setConditionSaleItemID(int conditionSaleItemID) {
+        this.conditionSaleItemID = conditionSaleItemID;
+    }
+
+    public double getConditionSaleAmount() {
+        return conditionSaleAmount;
+    }
+
+    public void setConditionSaleAmount(double conditionSaleAmount) {
+        this.conditionSaleAmount = conditionSaleAmount;
     }
 }

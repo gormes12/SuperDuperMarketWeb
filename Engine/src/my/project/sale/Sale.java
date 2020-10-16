@@ -11,10 +11,11 @@ public class Sale {
     private String saleName;
     private int belongToStoreID;
     private final Pair<Integer, Double> conditionSale;
+    private final String saleItemName;
     private final Pair<String, List<SaleDetails>> details;
 
-    public Sale(String saleName, int itemSerialNumber, double quantityOf, int storeID, String operator) {
-
+    public Sale(String saleName, String itemName, int itemSerialNumber, double quantityOf, int storeID, String operator) {
+        saleItemName = itemName;
         this.saleName = clearLeadingSpacesFromSaleName(saleName);
         conditionSale = new Pair<>(itemSerialNumber, quantityOf);
         details = new Pair<>(operator, new LinkedList<>());
@@ -52,7 +53,7 @@ public class Sale {
             saleDetailsList.add(saleDetails.createSaleDetailsDTO());
         }
 
-        return new SaleDTO(saleName, new Pair<>(conditionSale.getKey(), conditionSale.getValue()), new Pair<>(details.getKey(), saleDetailsList), belongToStoreID);
+        return new SaleDTO(saleName, saleItemName, new Pair<>(conditionSale.getKey(), conditionSale.getValue()), new Pair<>(details.getKey(), saleDetailsList), belongToStoreID);
     }
 
     //    public void removeSaleDetails()

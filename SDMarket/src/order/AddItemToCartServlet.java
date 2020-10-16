@@ -1,8 +1,9 @@
 package order;
 
-import com.google.gson.Gson;
-import dto.ShoppingCartDTO;
+import com.sun.org.apache.xpath.internal.operations.Number;
 import my.project.manager.ZoneManager;
+import my.project.user.User;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -13,14 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.HashMap;
 
-@WebServlet(name = "HistoryOrdersServlet", urlPatterns = {"/historyOrders"})
-public class HistoryOrdersServlet extends HttpServlet {
-    private void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+@WebServlet(name = "AddItemToCartServlet", urlPatterns = {"/addItemToCart"})
+public class AddItemToCartServlet extends HttpServlet {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        response.setContentType("application/json");
+        response.setContentType("text/html;charset=UTF-8");
 
         String username = SessionUtils.getUsername(request);
         if (username == null) {
@@ -34,31 +35,39 @@ public class HistoryOrdersServlet extends HttpServlet {
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
 
-        /*
-        Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
-        Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
-         */
-        int storeID = Integer.parseInt(request.getParameter("stores"));
-        List<ShoppingCartDTO> ordersEntries;
-        synchronized (getServletContext()) {
-            ordersEntries = zoneManager.getShoppingCartsOfStore(storeID);
+        Integer serialNumber = Integer.parseInt(request.getParameter("serialnumber"));
+        Double amount = Double.parseDouble(request.getParameter("amount"));
+
+        if(zoneManager.getPurchaseCategoryOfItem(serialNumber).equals("Quantity")){
+            if (amount % 1 != 0) {
+                try (PrintWriter out = response.getWriter()) {
+                    response.setStatus(500);
+                    out.print("must insert Integer Number");
+                    out.flush();
+                    return;
+                }
+            }
         }
 
-        // log and create the response json string
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(ordersEntries);
-
-        try (PrintWriter out = response.getWriter()) {
-            out.print(jsonResponse);
-            out.flush();
+        HashMap<Integer, Double> shoppingCart = (HashMap<Integer, Double>) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_SHOPPING_CART);
+        if (shoppingCart == null) {
+            shoppingCart = new HashMap<>();
         }
+
+
+
+        Double prevAmount = shoppingCart.putIfAbsent(serialNumber, amount);
+        if (prevAmount != null) {
+            shoppingCart.put(serialNumber, amount + prevAmount);
+        }
+
+        request.getSession(false).setAttribute(ConstantsUtils.CURRENT_SHOPPING_CART, shoppingCart);
 
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -72,7 +81,6 @@ public class HistoryOrdersServlet extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -86,7 +94,6 @@ public class HistoryOrdersServlet extends HttpServlet {
 
     /**
      * Returns a short description of the servlet.
-     *
      * @return a String containing servlet description
      */
     @Override

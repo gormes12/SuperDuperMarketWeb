@@ -125,11 +125,11 @@ public class ZoneManager {
         }
     }
 
-    public void addSaleToStore(int storeID, String saleName, int itemId, double quantity, String operator, List<SaleDetails> detailsList) {
+    public void addSaleToStore(int storeID, String saleName, String itemName, int itemId, double quantity, String operator, List<SaleDetails> detailsList) {
         if (isValidIDStore(storeID)) {
             checkValidItem(storeID, itemId, quantity);
             checkDetailsList(storeID, detailsList);
-            storesById.get(storeID).addSale(new Sale(saleName, itemId, quantity, storeID, operator), detailsList);
+            storesById.get(storeID).addSale(new Sale(saleName, itemName, itemId, quantity, storeID, operator), detailsList);
         } else {
             throw new ValueException("There is no store with id:" + storeID + " in the system");
         }
@@ -239,11 +239,11 @@ public class ZoneManager {
     }
 
     public boolean isLocationCaughtUp(int xCoordinate, int yCoordinate) {
-        return storesByLocation.containsKey(new Location(xCoordinate, yCoordinate)) || customersByLocation.containsKey(new Location(xCoordinate, yCoordinate));
+        return storesByLocation.containsKey(new Location(xCoordinate, yCoordinate));
     }
 
     public boolean isLocationCaughtUp(Location location) {
-        return storesByLocation.containsKey(location) || customersByLocation.containsKey(location);
+        return storesByLocation.containsKey(location);
     }
 
     public double getPriceItemFromStore(int storeID, int serialNumber) {
@@ -307,25 +307,26 @@ public class ZoneManager {
     public void executeOrderAndAddToSystem(int customerID) {
         Customer customer = customersById.getOrDefault(customerID, null);
         if (customer != null) {
-            executeOrderAndAddToSystem();
+            executeOrderAndAddToSystem(tempOrder);
             customer.addOrder(tempOrder);
         } else {
             throw new ValueException("Customer's ID not found! Please Try Again!");
         }
     }
 
-    public void executeOrderAndAddToSystem(/*int inputStoreID*/) {
-        orders.putIfAbsent(tempOrder.getOrderID(), tempOrder);
-        for (ShoppingCart cart : tempOrder.getShoppingCarts().values()) {
+    public void executeOrderAndAddToSystem(Order orderToExecute) {
+        orders.putIfAbsent(orderToExecute.getOrderID(), orderToExecute);
+        for (ShoppingCart cart : orderToExecute.getShoppingCarts().values()) {
             Store store = cart.getStoreDetails();//storesById.get(inputStoreID);
             store.addOrder(cart);
             store.addDeliveryRevenue(cart.getDeliveryCost());
         }
-        updateAmountSoldPerItem();
+
+        updateAmountSoldPerItem(orderToExecute);
     }
 
-    private void updateAmountSoldPerItem() {
-        for (ShoppingCart cart : tempOrder.getShoppingCarts().values()) {
+    private void updateAmountSoldPerItem(Order fromOrder) {
+        for (ShoppingCart cart : fromOrder.getShoppingCarts().values()) {
             for (ShoppingCartItem item : cart.getCartItem()/*.values()*/) {
                 amountSoldItem.put(item.getSerialNumber(), amountSoldItem.getOrDefault(item.getSerialNumber(), (double) 0) + item.getAmount());
             }
@@ -408,7 +409,7 @@ public class ZoneManager {
         pairListStoreAndAvgPricePerItem.put(serialNumber, new Pair<>(listStoreAndPricePair.getKey(), newAvgPrice));
     }
 
-    public void createMinOrderFromItemList(LocalDate orderDateRequested, Customer customer, HashMap<Integer, Double> itemList) {
+    public Order createMinOrderFromItemList(LocalDate orderDateRequested, Customer customer, HashMap<Integer, Double> itemList) {
         int storeID;
         createOrder(orderDateRequested);
         for (Integer serialNumber : itemList.keySet()) {
@@ -419,6 +420,8 @@ public class ZoneManager {
 
             addItemToCartFromStore(storeID, serialNumber, itemList.get(serialNumber));
         }
+
+        return tempOrder;
     }
 
     private int getStoreIDOfMinPriceOfItem(Integer serialNumber) {
@@ -474,12 +477,14 @@ public class ZoneManager {
         return store.getPricePerKilometer() * (calculateDistance(new Location(store.getLocation()), customer.getLocation()));
     }*/
 
-    public void createOrderFromItemList(LocalDate date, int storeID, Customer customer, HashMap<Integer, Double> itemsList) {
+    public Order createOrderFromItemList(LocalDate date, int storeID, Customer customer, HashMap<Integer, Double> itemsList) {
         createOrder(date);
         createShoppingCart(storeID, customer);
         for (Map.Entry<Integer, Double> entry : itemsList.entrySet()) {
             addItemToCartFromStore(storeID, entry.getKey(), entry.getValue());
         }
+
+        return tempOrder;
     }
 
     public boolean isAvailableSales() {
@@ -495,22 +500,24 @@ public class ZoneManager {
         }
     }
 
-    public void addChosenSaleItemsToCart(HashMap<SaleDTO, Integer> chosenSaleItems) {
+    public Order addChosenSaleItemsToCart(HashMap<SaleDTO, Integer> chosenSaleItems, Order orderToAddSales) {
         for (SaleDTO sale : chosenSaleItems.keySet()) {
-            if (sale.getDetails().getKey().equals("ONE-OF")) {
+            if (sale.getOperator().equals("ONE-OF")) {
                 SaleDetailsDTO saleDetails = sale.getSpecificSaleDetailsOnItemFromSale(chosenSaleItems.get(sale));
-                addSaleToCartFromStore(sale.getBelongToStoreID(), saleDetails);
+                addSaleToCartFromStore(orderToAddSales, sale.getBelongToStoreID(), saleDetails);
             } else {
-                for (SaleDetailsDTO saleDetails : sale.getDetails().getValue()){
-                    addSaleToCartFromStore(sale.getBelongToStoreID(), saleDetails);
+                for (SaleDetailsDTO saleDetails : sale.getDetails()){
+                    addSaleToCartFromStore(orderToAddSales, sale.getBelongToStoreID(), saleDetails);
                 }
             }
         }
+
+        return orderToAddSales;
     }
 
-    private void addSaleToCartFromStore(int storeID, SaleDetailsDTO saleDetails) {
+    private void addSaleToCartFromStore(Order orderToAddSale ,int storeID, SaleDetailsDTO saleDetails) {
         SuperMarketItem item = getItemFromStore(storeID, saleDetails.getItemSerialNumber());
-        tempOrder.addItemToShoppingCartFromStore(
+        orderToAddSale.addItemToShoppingCartFromStore(
                 storeID, new SaleItemInShoppingCart(
                         item.getSerialNumber(),
                         item.getItemName(),
@@ -581,5 +588,16 @@ public class ZoneManager {
 
         return new ZoneDTO(ownerName, zoneName, items.size(), storesById.size(), orders.size(),
                 orders.size() == 0? 0: sum / orders.size());
+    }
+
+    public List<ShoppingCartDTO> getShoppingCartsOfStore(int storeID) {
+        List<ShoppingCartDTO> result = new LinkedList<>();
+
+        Store store = storesById.get(storeID);
+        for (ShoppingCart shoppingCart : store.getOrders().values()){
+            result.add(shoppingCart.createShoppingCartDTO());
+        }
+
+        return result;
     }
 }

@@ -1,8 +1,12 @@
 package order;
 
 import com.google.gson.Gson;
-import dto.ShoppingCartDTO;
+import dto.SaleDTO;
+import my.project.location.Location;
 import my.project.manager.ZoneManager;
+import my.project.order.Order;
+import my.project.user.Customer;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -13,10 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
-@WebServlet(name = "HistoryOrdersServlet", urlPatterns = {"/historyOrders"})
-public class HistoryOrdersServlet extends HttpServlet {
+@WebServlet(name = "SummaryOrderScServlet", urlPatterns = {"/summaryOrder"})
+public class SummaryOrderScServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -27,6 +33,8 @@ public class HistoryOrdersServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
 
+//        Customer customer = (Customer) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(username);
+
         String zoneName = SessionUtils.getChosenZoneName(request);
         if (zoneName == null) {
             response.sendRedirect(request.getContextPath() + "/pages/main/information.html");
@@ -34,25 +42,35 @@ public class HistoryOrdersServlet extends HttpServlet {
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
 
-        /*
-        Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
-        Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
-         */
-        int storeID = Integer.parseInt(request.getParameter("stores"));
-        List<ShoppingCartDTO> ordersEntries;
-        synchronized (getServletContext()) {
-            ordersEntries = zoneManager.getShoppingCartsOfStore(storeID);
-        }
-
-        // log and create the response json string
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(ordersEntries);
-
         try (PrintWriter out = response.getWriter()) {
+
+            /*Location location = (Location) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_LOCATION);
+            customer.setLocation(location);*/
+
+//            LocalDate date = (LocalDate) request.getSession(false).getAttribute(ConstantsUtils.DATE_ORDER);
+
+            Order orderInProcess = SessionUtils.getOrderInProcess(request);
+            HashMap<SaleDTO, Integer> salesCart = (HashMap<SaleDTO, Integer>) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_SELECTED_SALES_CART);
+
+            if (!salesCart.isEmpty()) {
+                // ADD SALES TO ORDER AND SAVE ON SESSION
+                orderInProcess = zoneManager.addChosenSaleItemsToCart(salesCart, orderInProcess);
+                SessionUtils.saveOrderInProcess(request, orderInProcess);
+            }
+
+            Gson gson = new Gson();
+            String jsonResponse;
+
+            jsonResponse = gson.toJson(orderInProcess.createOrderDTO());
             out.print(jsonResponse);
             out.flush();
-        }
 
+            /*} catch (Exception e) {
+                response.setStatus(500);
+                out.print(e.getMessage());
+                out.flush();
+            }*/
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

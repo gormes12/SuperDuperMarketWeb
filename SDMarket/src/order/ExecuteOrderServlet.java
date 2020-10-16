@@ -1,8 +1,12 @@
 package order;
 
 import com.google.gson.Gson;
-import dto.ShoppingCartDTO;
+import dto.SaleDTO;
+import my.project.location.Location;
 import my.project.manager.ZoneManager;
+import my.project.order.Order;
+import my.project.user.Customer;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -13,19 +17,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.HashMap;
 
-@WebServlet(name = "HistoryOrdersServlet", urlPatterns = {"/historyOrders"})
-public class HistoryOrdersServlet extends HttpServlet {
+@WebServlet(name = "ExecuteOrderServlet", urlPatterns = {"/executeOrder"})
+public class ExecuteOrderServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("application/json");
+        response.setContentType("text/html;charset=UTF-8");
 
         String username = SessionUtils.getUsername(request);
         if (username == null) {
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
+
+        Customer customer = (Customer) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(username);
 
         String zoneName = SessionUtils.getChosenZoneName(request);
         if (zoneName == null) {
@@ -34,25 +41,25 @@ public class HistoryOrdersServlet extends HttpServlet {
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
 
-        /*
-        Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
-        Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
-         */
-        int storeID = Integer.parseInt(request.getParameter("stores"));
-        List<ShoppingCartDTO> ordersEntries;
-        synchronized (getServletContext()) {
-            ordersEntries = zoneManager.getShoppingCartsOfStore(storeID);
-        }
-
-        // log and create the response json string
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(ordersEntries);
-
         try (PrintWriter out = response.getWriter()) {
-            out.print(jsonResponse);
-            out.flush();
-        }
 
+            Order orderInProcess = SessionUtils.getOrderInProcess(request);
+            zoneManager.executeOrderAndAddToSystem(orderInProcess);
+            customer.addOrder(orderInProcess);
+
+            /*Gson gson = new Gson();
+            String jsonResponse;
+
+            jsonResponse = gson.toJson(orderInProcess.createOrderDTO());
+            out.print(jsonResponse);
+            out.flush();*/
+
+            /*} catch (Exception e) {
+                response.setStatus(500);
+                out.print(e.getMessage());
+                out.flush();
+            }*/
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
