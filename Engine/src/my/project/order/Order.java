@@ -37,6 +37,10 @@ public class Order {
         }
     }
 
+    public LocalDate getOrderDate() {
+        return orderDate;
+    }
+
     private void addTotalDeliveryCost(double cost) {
         deliveryCost+=cost;
     }

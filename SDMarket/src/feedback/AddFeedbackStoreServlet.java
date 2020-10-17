@@ -1,12 +1,6 @@
-package order;
+package feedback;
 
-import com.google.gson.Gson;
-import dto.SaleDTO;
-import my.project.location.Location;
 import my.project.manager.ZoneManager;
-import my.project.order.Order;
-import my.project.order.ShoppingCart;
-import my.project.user.Customer;
 import my.project.user.StoreOwner;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
@@ -22,10 +16,9 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.HashMap;
 
-@WebServlet(name = "ExecuteOrderServlet", urlPatterns = {"/executeOrder"})
-public class ExecuteOrderServlet extends HttpServlet {
-    private void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+@WebServlet(name = "AddFeedbackStoreServlet", urlPatterns = {"/addFeedbackToStore"})
+public class AddFeedbackStoreServlet extends HttpServlet {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
 
@@ -34,8 +27,6 @@ public class ExecuteOrderServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
 
-        Customer customer = (Customer) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(username);
-
         String zoneName = SessionUtils.getChosenZoneName(request);
         if (zoneName == null) {
             response.sendRedirect(request.getContextPath() + "/pages/main/information.html");
@@ -43,35 +34,20 @@ public class ExecuteOrderServlet extends HttpServlet {
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
 
-//        try (PrintWriter out = response.getWriter()) {
-        StoreOwner storeOwner;
-        Order orderInProcess = SessionUtils.getOrderInProcess(request);
-        zoneManager.executeOrderAndAddToSystem(orderInProcess);
-        customer.addOrder(orderInProcess);
-        for (ShoppingCart shoppingCart : orderInProcess.getShoppingCarts().values()) {
-            storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(shoppingCart.getStoreDetails().getOwnerName());
-            storeOwner.receivingPayment(orderInProcess.getOrderDate(), customer.withdrawalMoney(orderInProcess.getOrderDate(), shoppingCart.getOrderCost()));
-        }
+        Integer storeID = Integer.parseInt(request.getParameter("storeID"));
+        Integer rate = Integer.parseInt(request.getParameter("rate"));
+        String textRate = request.getParameter("textRate");
 
-            /*Gson gson = new Gson();
-            String jsonResponse;
+        LocalDate date = (LocalDate) request.getSession(false).getAttribute(ConstantsUtils.DATE_ORDER);
 
-            jsonResponse = gson.toJson(orderInProcess.createOrderDTO());
-            out.print(jsonResponse);
-            out.flush();*/
+        StoreOwner storeOwner = (StoreOwner) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(zoneManager.getStoreOwnerName(storeID));
+        storeOwner.addFeedback(username, date, rate, textRate);
 
-            /*} catch (Exception e) {
-                response.setStatus(500);
-                out.print(e.getMessage());
-                out.flush();
-            }*/
-//        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -85,7 +61,6 @@ public class ExecuteOrderServlet extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -99,7 +74,6 @@ public class ExecuteOrderServlet extends HttpServlet {
 
     /**
      * Returns a short description of the servlet.
-     *
      * @return a String containing servlet description
      */
     @Override

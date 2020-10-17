@@ -11,14 +11,14 @@ public class OrderDTO {
     private int orderID;
     private List<ShoppingCartDTO> shoppingCarts;
     private double deliveryCost;
-    private LocalDate orderDate;
+    private String orderDate;
     private double totalOrderPrice;
 
     public OrderDTO(int orderID, LocalDate orderDate, List<ShoppingCartDTO> shoppingCart, double deliveryCost) {
         this.orderID = orderID;
         this.shoppingCarts = shoppingCart;
         this.deliveryCost = deliveryCost;
-        this.orderDate = orderDate;
+        this.orderDate = orderDate.toString();
         totalOrderPrice = getOrderCost();
     }
 
@@ -30,7 +30,7 @@ public class OrderDTO {
         return deliveryCost;
     }
 
-    public LocalDate getOrderDate() {
+    public String getOrderDate() {
         return orderDate;
     }
 

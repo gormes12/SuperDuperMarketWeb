@@ -304,7 +304,7 @@ public class ZoneManager {
         return tempOrder.createOrderDTO();
     }
 
-    public void executeOrderAndAddToSystem(int customerID) {
+    /*public void executeOrderAndAddToSystem(int customerID) {
         Customer customer = customersById.getOrDefault(customerID, null);
         if (customer != null) {
             executeOrderAndAddToSystem(tempOrder);
@@ -312,10 +312,11 @@ public class ZoneManager {
         } else {
             throw new ValueException("Customer's ID not found! Please Try Again!");
         }
-    }
+    }*/
 
-    public void executeOrderAndAddToSystem(Order orderToExecute) {
+    public void executeOrderAndAddToSystem(Order orderToExecute/*, Customer customer*/) {
         orders.putIfAbsent(orderToExecute.getOrderID(), orderToExecute);
+//        customer.addOrder(orderToExecute);
         for (ShoppingCart cart : orderToExecute.getShoppingCarts().values()) {
             Store store = cart.getStoreDetails();//storesById.get(inputStoreID);
             store.addOrder(cart);
@@ -571,6 +572,11 @@ public class ZoneManager {
         return ownerName;
     }
 
+    public String getStoreOwnerName(int storeID) {
+        Store store = storesById.get(storeID);
+        return store.getOwnerName();
+    }
+
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
     }
@@ -600,4 +606,5 @@ public class ZoneManager {
 
         return result;
     }
+
 }

@@ -12,6 +12,7 @@ var SALES_URL = buildUrlWithContextPath("sales");
 var ADD_SALE_TO_CART = buildUrlWithContextPath("addSaleToCart");
 var SHOW_SUMMARY_ORDER_URL = buildUrlWithContextPath("summaryOrder");
 var EXECUTE_ORDER_URL = buildUrlWithContextPath("executeOrder");
+var ADD_FEEDBACK_TO_STORE = buildUrlWithContextPath("addFeedbackToStore");
 
 
 $(function() {
@@ -429,7 +430,7 @@ function initMakeOrderForm(){
                 },
                 success: function (items) {
                     changeToScTwoInMakeOrder();
-                     showAvailableItemsForOrder(items, orderType);
+                    showAvailableItemsForOrder(items, orderType);
                 }
             });
         }
@@ -506,11 +507,15 @@ function showSummaryOrder(order) {
         "<span style=\"visibility: hidden\">enter</span>\n" +
         "</p>" +
         "<p class=\"w3-cell-bottommiddle\">\n" +
-        "                <button type=\"submit\" onclick='executeOrder()' style=\"border:none ;background:transparent\">\n" +
+        "                <button class='executeOrderButton' type=\"submit\" style=\"border:none ;background:transparent\">\n" +
         "                    <i class=\"material-icons w3-xxlarge \">arrow_forward</i>\n" +
         "                </button>\n" +
         "            </p>"
     ).appendTo($("#sub-cart"));
+
+    $( ".executeOrderButton:last" ).click(function() {
+        executeOrder(order.shoppingCarts);
+    });
 
     $.each(order.shoppingCarts || [], function (index, shoppingCart) {
         $(
@@ -533,15 +538,93 @@ function showSummaryOrder(order) {
 
 };
 
-function executeOrder(){
+function executeOrder(shoppingCarts){
     $.ajax({
         url: EXECUTE_ORDER_URL,
         success: function() {
-            console.log("Success!!!!!!!!!!!!!");
+            console.log("Order Made!");
+            suggestGiveFeedback(shoppingCarts);
         },
         error: function (error){
             console.log(error.responseText);
         }
+    });
+};
+
+function suggestGiveFeedback(shoppingCarts){
+    $("#sub-cart").empty();
+    var feedbacksContainer = $("#order-items");
+    feedbacksContainer.empty().append("<h2>Order FeedBack</h2>");
+    $.each(shoppingCarts || [], function (index, cart) {
+        $(
+            "<form id=feedbackform" + cart.storeID + " class=\"w3-row add-feedback-form \" method=\"get\">" +
+            "    <div class=\"w3-card-4 w3-round-xlarge w3-padding\" style=\"width:40%\">\n" +
+            "        <header class=\"w3-container w3-light-grey\">\n" +
+            "        <img src=\"../../imageAndIcon/feedback.png\"  alt=\"feedback\" class=\"w3-left  w3-margin-right\" style=\"width:60px\">\n" +
+            "        <h3> " + cart.storeName +" </h3>\n" +
+            "        </header>\n" +
+            "        <div class=\"w3-container\">\n" +
+            "            <h6>How Would You Rate This Store?</h6>\n" +
+            "            <input type=\"text\" name=\"storeID\" value=" + cart.storeID + " style='display: none' />\n" +
+            "            <p class=\"star-widget rate\">\n" +
+            "                <input type=\"radio\" id=star5-form" + index + " name=\"rate\" value=\"5\" required/>\n" +
+            "                <label title=\"rate\" for=star5-form" + index +  ">5 stars</label>\n" +
+            "                <input type=\"radio\" id=star4-form" + index + " name=\"rate\" value=\"4\" required/>\n" +
+            "                <label title=\"rate\" for=star4-form" + index +  ">4 stars</label>\n" +
+            "                <input type=\"radio\" id=star3-form" + index + " name=\"rate\" value=\"3\" required/>\n" +
+            "                <label title=\"rate\" for=star3-form" + index +  ">3 stars</label>\n" +
+            "                <input type=\"radio\" id=star2-form" + index + " name=\"rate\" value=\"2\" required/>\n" +
+            "                <label title=\"rate\" for=star2-form" + index +  ">2 stars</label>\n" +
+            "                <input type=\"radio\" id=star1-form" + index + " name=\"rate\" value=\"1\" required/>\n" +
+            "                <label title=\"rate\" for=star1-form" + index +  ">1 star</label>\n" +
+            "            </p>\n" +
+            "            <p class=\"textarea\">\n" +
+            "                <textarea name='textRate' cols=\"30\" placeholder=\"Describe your experience..\" ></textarea>\n" +
+            "            </p>\n" +
+            "            <div class=\"btn\">\n" +
+            "                <button class=\"w3-button w3-block w3-dark-grey\" type=\"submit\">Rate</button>\n" +
+            "                <span id=error-add-feedback-s"+cart.storeID+ " class=\"w3-text-red \" style=\"font-size: 13px\"></span>" +
+            "            </div>\n" +
+            "        </div>\n" +
+            "    </div>\n" +
+            "</form>\n"+
+            "<hr style=\"width:40%\">"
+        ).appendTo(feedbacksContainer);
+    });
+
+    initAddFeedbackForms();
+};
+
+function initAddFeedbackForms(){
+    $(".add-feedback-form").submit(function () {
+
+        var parameters = $(this).serialize();
+        var storeID = $(this).find("input[name=storeID]").val();
+        var storeName = $(this).find("h3").text();
+        var formID =  $(this).attr("id");/*$(this).find("form").attr("id");*/
+
+        $.ajax({
+            data: parameters,
+            url: ADD_FEEDBACK_TO_STORE,
+            timeout: 2000,
+            error: function (res) {
+                $("#error-add-feedback-s"+storeID).text(res.responseText);
+            },
+            success: function () {
+                // $("#error-add-feedback-s"+storeID).text("feedback add");
+                $("#" + formID).empty();
+                $(
+                    "<div class=\"w3-card-4 w3-round-xlarge w3-padding\" style=\"width:40%\">\n" +
+                    "<header> " +
+                    "<h3> The feedback to store named " + storeName + ", id - " + storeID + " was sent successfully! </h3>\n" +
+                    "</header> " +
+                    "</div>"
+                ).appendTo($("#"+formID));
+            }
+        });
+
+        // by default - we'll always return false so it doesn't redirect the user.
+        return false;
     });
 };
 
@@ -584,34 +667,7 @@ function showSales(sales) {
         appendSaleDetailsToList("listToExecute"+index, sale.saleDetailsInListString);
     });
 
-    // initAddItemToCartForm();
 };
-
-/*function initAddItemToCartForm(){
-    $(".add-item-to-cart-form").submit(function () {
-
-        var parameters = $(this).serialize();
-        var Amount = $(this).find("input[name=amount]").val();
-        var chosenserialnumber= $(this).find(".serialNumber").attr('value');
-        var chosenitemName= $(this).find(".itemName").attr('value');
-
-        $.ajax({
-            data: parameters +"&serialnumber="+chosenserialnumber,
-            url: ADD_ITEM_TO_CART,
-            timeout: 2000,
-            error: function (res) {
-                $("#error-add-item-s"+chosenserialnumber).text(res.responseText);
-            },
-            success: function () {
-                $("#error-add-item-s"+chosenserialnumber).text("");
-                addItemToSubCart(chosenitemName, chosenserialnumber, Amount);
-            }
-        });
-
-        // by default - we'll always return false so it doesn't redirect the user.
-        return false;
-    });
-};*/
 
 function appendSaleDetailsToList(id, saleDetailsInListString){
     var idList = $("#"+id);
@@ -727,6 +783,7 @@ function showAvailableItemsForOrder(items, orderType){
             "    <div class=\"w3-col w3-rest \" style=\"width:30%\">" +
             "        <span value=\""+item.itemName+"\" class=\"w3-opacity itemName\">" + item.itemName + "</span><br>" +
             "        <span value=\""+item.serialNumber+"\" class=\"w3-opacity serialNumber\">Serial No. " + item.serialNumber + "</span><br>" +
+            "        <span class=\"w3-opacity serialNumber\">Purchase Category: " + item.purchaseCategory + "</span><br>" +
             "<span id=price"+index+" class=\"w3-text-blue\">-</span>"+
             "    </div>" +
             "    <div class=\"w3-col w3-right\" style=\"width:35%\">" +
