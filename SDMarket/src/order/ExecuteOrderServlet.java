@@ -47,7 +47,7 @@ public class ExecuteOrderServlet extends HttpServlet {
         StoreOwner storeOwner;
         Order orderInProcess = SessionUtils.getOrderInProcess(request);
         zoneManager.executeOrderAndAddToSystem(orderInProcess);
-        customer.addOrder(orderInProcess);
+        customer.addOrder(zoneName, orderInProcess);
         for (ShoppingCart shoppingCart : orderInProcess.getShoppingCarts().values()) {
             storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(shoppingCart.getStoreDetails().getOwnerName());
             storeOwner.receivingPayment(orderInProcess.getOrderDate(), customer.withdrawalMoney(orderInProcess.getOrderDate(), shoppingCart.getOrderCost()));

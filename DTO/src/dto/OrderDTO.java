@@ -13,6 +13,11 @@ public class OrderDTO {
     private double deliveryCost;
     private String orderDate;
     private double totalOrderPrice;
+    private int destinationXCoordinate;
+    private int destinationYCoordinate;
+    private int totalStoresPurchasedFrom;
+    private int totalItemsAmount;
+    private double totalItemsPrice;
 
     public OrderDTO(int orderID, LocalDate orderDate, List<ShoppingCartDTO> shoppingCart, double deliveryCost) {
         this.orderID = orderID;
@@ -20,6 +25,11 @@ public class OrderDTO {
         this.deliveryCost = deliveryCost;
         this.orderDate = orderDate.toString();
         totalOrderPrice = getOrderCost();
+        destinationXCoordinate = shoppingCart.get(0).getCustomerXCoordinate();
+        destinationYCoordinate = shoppingCart.get(0).getCustomerYCoordinate();
+        totalStoresPurchasedFrom = shoppingCart.size();
+        totalItemsAmount = getTotalItemsAmount();
+        totalItemsPrice = getTotalItemsPrice();
     }
 
     public List<ShoppingCartDTO> getShoppingCarts() {

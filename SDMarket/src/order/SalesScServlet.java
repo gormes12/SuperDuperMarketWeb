@@ -76,9 +76,7 @@ public class SalesScServlet extends HttpServlet {
                 SessionUtils.saveOrderInProcess(request, order);
 
                 // CREATE TEMP SALES CART
-                if (!salesEntries.isEmpty()){
-                    request.getSession(false).setAttribute(ConstantsUtils.CURRENT_SELECTED_SALES_CART, new HashMap<>());
-                }
+                request.getSession(false).setAttribute(ConstantsUtils.CURRENT_SELECTED_SALES_CART, new HashMap<>());
 
                 jsonResponse = gson.toJson(salesEntries);
                 out.print(jsonResponse);

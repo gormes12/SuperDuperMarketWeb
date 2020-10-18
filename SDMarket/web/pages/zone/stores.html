@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="../../css/feedback.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> //add for quotes.
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="../../common/jquery-2.0.3.min.js"></script>
@@ -108,7 +109,7 @@
     </div>
 
         <!------ feedback details tab option ------>
-    <div id="feedback-details" class="tab-option" style="display:none">
+    <div id="feedback-details" class="tab-option w3-container" style="display:none">
 
     </div>
 
@@ -288,8 +289,15 @@
 
     <!------ show my Order tab option ------>
 
-    <div id="my-orders" class="tab-option" style="display:none">
+    <div id="my-orders" class="tab-option" style="display:none" >
+        <div class="w3-row w3-center" >
+            <div id="customer-order-details-table" style='display: flex; justify-content: center'>
 
+            </div>
+            <div id="items-customer-order-details">
+
+            </div>
+        </div>
     </div>
 
 </div>

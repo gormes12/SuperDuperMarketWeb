@@ -4,13 +4,13 @@ import java.time.LocalDate;
 
 public class Feedback {
     private final String userGiverFeedback;
-    private final LocalDate date;
+    private final String date;
     private final int numericalRating;
     private final String textRating;
 
     public Feedback(String userGiverFeedback, LocalDate date, int numericalRating, String textRating) {
         this.userGiverFeedback = userGiverFeedback;
-        this.date = date;
+        this.date = date.toString();
         this.numericalRating = numericalRating;
         this.textRating = textRating;
     }
@@ -19,7 +19,7 @@ public class Feedback {
         return userGiverFeedback;
     }
 
-    public LocalDate getDate() {
+    public String getDate() {
         return date;
     }
 

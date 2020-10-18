@@ -464,7 +464,7 @@ public class ZoneManager {
         }
     }
 
-    public List<CustomerDTO> getCustomers() {
+    /*public List<CustomerDTO> getCustomers() {
         List<CustomerDTO> result = new LinkedList<>();
 
         for (Customer customer : customersById.values()) {
@@ -472,7 +472,7 @@ public class ZoneManager {
         }
 
         return result;
-    }
+    }*/
 
     /*public double calculateDeliveryCost(StoreDTO store, CustomerDTO customer) {
         return store.getPricePerKilometer() * (calculateDistance(new Location(store.getLocation()), customer.getLocation()));

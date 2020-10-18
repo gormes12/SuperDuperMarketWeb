@@ -6,12 +6,15 @@ import my.project.order.Order;
 import my.project.user.User;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Customer extends User {
 
     private Location location;
-    private HashMap<Integer, Order> orders;
+    private HashMap<String, List<Order>> orders; // String: ZoneName
 
     public Customer(int id, String username) {
         super(id,username, eUserType.Customer);
@@ -36,15 +39,25 @@ public class Customer extends User {
         this.location = location;
     }
 
-    public void addOrder(Order order) {
-        orders.putIfAbsent(order.getOrderID(), order);
+    public void addOrder(String zoneName, Order order) {
+        List<Order> orderList = orders.getOrDefault(zoneName, null);
+        if (orderList == null){
+            orderList = new LinkedList<>();
+        }
+
+        orderList.add(order);
+        orders.put(zoneName, orderList);
+    }
+
+    public Collection<Order> getOrdersFromZone(String zoneName) {
+        return orders.get(zoneName);
     }
 
     public int getTotalAmountOrdersPlaced(){
         return orders.size();
     }
 
-    public double getAvgOrdersPrice() {
+    /*public double getAvgOrdersPrice() {
         double sumOrdersPrice = 0;
 
         for(Order order : orders.values()){
@@ -52,9 +65,9 @@ public class Customer extends User {
         }
 
         return sumOrdersPrice / orders.size();
-    }
+    }*/
 
-    public double getAvgDeliveryPrice() {
+    /*public double getAvgDeliveryPrice() {
         double sumDeliveryPrice = 0;
 
         for(Order order : orders.values()){
@@ -62,14 +75,14 @@ public class Customer extends User {
         }
 
         return sumDeliveryPrice / orders.size();
-    }
+    }*/
 
-    public CustomerDTO createCustomerDTO() {
+   /* public CustomerDTO createCustomerDTO() {
         HashMap<Integer, OrderDTO> allOrders = new HashMap<>();
         for(Order order : orders.values()){
             allOrders.put(order.getOrderID(), order.createOrderDTO());
         }
 
         return new CustomerDTO(ID, username, new Point(location.getX(), location.getY()), allOrders);
-    }
+    }*/
 }

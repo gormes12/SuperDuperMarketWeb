@@ -1,8 +1,10 @@
 package order;
 
 import com.google.gson.Gson;
-import dto.ShoppingCartDTO;
+import dto.OrderDTO;
 import my.project.manager.ZoneManager;
+import my.project.order.Order;
+import my.project.user.Customer;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -13,10 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-@WebServlet(name = "HistoryOrdersServlet", urlPatterns = {"/historyOrders"})
-public class HistoryOrdersServlet extends HttpServlet {
+@WebServlet(name = "CustomerHistoryOrderServlet", urlPatterns = {"/customerHistoryOrders"})
+public class CustomerHistoryOrderServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -33,33 +37,30 @@ public class HistoryOrdersServlet extends HttpServlet {
         }
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
+        Customer customer = (Customer) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(username);
 
         /*
         Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
-        int storeID = Integer.parseInt(request.getParameter("stores"));
+        Collection<Order> orders;
+        synchronized (getServletContext()) {
+            orders = customer.getOrdersFromZone(zoneName);
+        }
+
+        List<OrderDTO> ordersEntries = new ArrayList<>();
+        for (Order order : orders){
+            ordersEntries.add(order.createOrderDTO());
+        }
 
         try (PrintWriter out = response.getWriter()) {
-            if (!zoneManager.getStoreOwnerName(storeID).equals(username)) {
-                response.setStatus(500);
-                out.print("You are not the owner of this store!" + System.lineSeparator() + "You have no accesses to see it orders.");
-                out.flush();
-            }
-
-            List<ShoppingCartDTO> ordersEntries;
-            synchronized (getServletContext()) {
-                ordersEntries = zoneManager.getShoppingCartsOfStore(storeID);
-            }
-
-            // log and create the response json string
+            // create the response json string
             Gson gson = new Gson();
             String jsonResponse = gson.toJson(ordersEntries);
 
             out.print(jsonResponse);
             out.flush();
         }
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
