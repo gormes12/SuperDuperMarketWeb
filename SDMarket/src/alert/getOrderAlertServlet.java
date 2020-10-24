@@ -1,12 +1,19 @@
-package order;
+package alert;
 
 import com.google.gson.Gson;
 import dto.OrderDTO;
-import my.project.manager.ZoneManager;
-import my.project.order.Order;
-import my.project.user.Customer;
+import dto.ShoppingCartDTO;
+import dto.StoreDTO;
+import dto.ZoneDTO;
+import my.project.manager.OrderManager;
+import my.project.manager.SystemManager;
+import my.project.manager.ZonesManager;
+import my.project.user.StoreOwner;
+import my.project.user.User;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import zones.ZonesServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,12 +22,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-@WebServlet(name = "CustomerHistoryOrderServlet", urlPatterns = {"/customerHistoryOrders"})
-public class CustomerHistoryOrderServlet extends HttpServlet {
+@WebServlet(name = "getOrderAlertServlet", urlPatterns = {"/getOrderAlert"})
+public class getOrderAlertServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -31,40 +36,66 @@ public class CustomerHistoryOrderServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
 
-        String zoneName = SessionUtils.getChosenZoneName(request);
-        if (zoneName == null) {
-            response.sendRedirect(request.getContextPath() + "/pages/main/information.html");
+        if (ServletUtils.getSystemManager(request.getServletContext()).getUserType(username).equals(User.eUserType.Customer)){
+            return;
         }
 
-        ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
-        Customer customer = (Customer) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(username);
+        /*
+        verify chat version given from the user is a valid number. if not it is considered an error and nothing is returned back
+         */
+        int orderAlertVersion = (int) request.getSession(false).getAttribute(ConstantsUtils.ORDER_ALERT_VERSION_PARAMETER);
+        if (orderAlertVersion == ConstantsUtils.INT_PARAMETER_ERROR) {
+            return;
+        }
+
+        StoreOwner storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(username);
+        OrderManager storeOwnerOrderManager = storeOwner.getOrderManager();
 
         /*
         Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
-        Collection<OrderDTO> orders;
+        int orderAlertStoreOwnerVersion = 0;
+        List<ShoppingCartDTO> ordersEntries;
         synchronized (getServletContext()) {
-            orders = customer.getOrdersFromZone(zoneName);
+            orderAlertStoreOwnerVersion = storeOwnerOrderManager.getVersion();
+            ordersEntries = storeOwnerOrderManager.getOrdersEntries(orderAlertVersion);
         }
 
-        /*List<OrderDTO> ordersEntries = new ArrayList<>();
+        if (orderAlertStoreOwnerVersion == orderAlertVersion){
+            return;
+        } else {
+            request.getSession(false).setAttribute(ConstantsUtils.ORDER_ALERT_VERSION_PARAMETER, orderAlertStoreOwnerVersion);
+        }
 
-        if (orders != null) {
-            for (Order order : orders) {
-                ordersEntries.add(order.createOrderDTO());
-            }
-        }*/
+        // log and create the response json string
+//        OrderAlertAndVersion cav = new OrderAlertAndVersion(ordersEntries, orderAlertStoreOwnerVersion);
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(ordersEntries);
+        logServerMessage("Server Zones version: " + orderAlertStoreOwnerVersion + ", User '" + username + "' Zone version: " + orderAlertVersion);
+        logServerMessage(jsonResponse);
 
         try (PrintWriter out = response.getWriter()) {
-            // create the response json string
-            Gson gson = new Gson();
-            String jsonResponse = gson.toJson(/*ordersEntries*/orders);
-
             out.print(jsonResponse);
             out.flush();
         }
+
     }
+
+    private void logServerMessage(String message){
+        System.out.println(message);
+    }
+
+    /*private static class OrderAlertAndVersion {
+
+        final private List<ShoppingCartDTO> entries;
+        final private int version;
+
+        public OrderAlertAndVersion(List<ShoppingCartDTO> entries, int version) {
+            this.entries = entries;
+            this.version = version;
+        }
+    }*/
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

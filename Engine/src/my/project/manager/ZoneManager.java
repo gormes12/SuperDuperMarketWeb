@@ -22,8 +22,9 @@ public class ZoneManager {
     public static final int LocationYMaxCoordinate = 50;
     public static final int LocationXMinCoordinate = 1;
     public static final int LocationYMinCoordinate = 1;
+    public static int STORE_ID = 100;
 
-    private String ownerName;
+    private String ownerZoneName;
     private final String zoneName;
     private HashMap<Integer, Item> items;   // K: serialNumber, V:item
     private HashMap<Integer, Pair<List<Store>, Double>> pairListStoreAndAvgPricePerItem;  // K: serialNumber, V:Pair(K: Store list that sell it, V: Average price per item)
@@ -44,7 +45,7 @@ public class ZoneManager {
 
     public ZoneManager(String zoneName, String ownerZoneUsername) {
         this.zoneName = zoneName;
-        ownerName = ownerZoneUsername;
+        ownerZoneName = ownerZoneUsername;
         items = new HashMap<>();
         pairListStoreAndAvgPricePerItem = new HashMap<>();
         storesById = new HashMap<>();
@@ -93,6 +94,19 @@ public class ZoneManager {
     public void addStore(String ownerName, String storeName, int storeID, Location storeLocation, double pricePerKilometer) {
         Store newStore = new Store(ownerName, storeName, storeID, storeLocation, pricePerKilometer);
         addStore(newStore);
+    }
+
+    public StoreDTO addStore(String ownerName, String storeName, Location storeLocation, double pricePerKilometer, HashMap<Integer, Double> items){
+        Store newStore = new Store(ownerName, storeName, STORE_ID, storeLocation, pricePerKilometer);
+        addStore(newStore);
+
+        for (Map.Entry<Integer, Double> entry : items.entrySet()) {
+            addItemToStore(STORE_ID, entry.getKey(), entry.getValue());
+        }
+
+        STORE_ID++;
+
+        return newStore.createStoreDTO();
     }
 
     public void addItemToStore(int storeID, SuperMarketItem superMarketItem) {
@@ -568,8 +582,8 @@ public class ZoneManager {
         return storesLocation;
     }
 
-    public String getOwnerName() {
-        return ownerName;
+    public String getOwnerZoneName() {
+        return ownerZoneName;
     }
 
     public String getStoreOwnerName(int storeID) {
@@ -577,8 +591,8 @@ public class ZoneManager {
         return store.getOwnerName();
     }
 
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
+    public void setOwnerZoneName(String ownerZoneName) {
+        this.ownerZoneName = ownerZoneName;
     }
 
     public String getZoneName() {
@@ -592,7 +606,7 @@ public class ZoneManager {
             sum += order.getTotalItemsPrice();
         }
 
-        return new ZoneDTO(ownerName, zoneName, items.size(), storesById.size(), orders.size(),
+        return new ZoneDTO(ownerZoneName, zoneName, items.size(), storesById.size(), orders.size(),
                 orders.size() == 0? 0: sum / orders.size());
     }
 

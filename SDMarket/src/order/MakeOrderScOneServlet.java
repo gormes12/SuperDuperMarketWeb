@@ -2,7 +2,6 @@ package order;
 
 import com.google.gson.Gson;
 import dto.ItemDTO;
-import dto.ShoppingCartDTO;
 import dto.SuperMarketItemDTO;
 import my.project.location.Location;
 import my.project.manager.ZoneManager;
@@ -51,6 +50,7 @@ public class MakeOrderScOneServlet extends HttpServlet {
                 response.setStatus(500);
                 out.print("This location caught up by store and you can't insert this location");
                 out.flush();
+                return;
             } else {
                 request.getSession(false).setAttribute(ConstantsUtils.CURRENT_LOCATION, location);
             }
@@ -63,7 +63,7 @@ public class MakeOrderScOneServlet extends HttpServlet {
             request.getSession(false).setAttribute(ConstantsUtils.DATE_ORDER, date);
 
             //create shopping cart
-            request.getSession(false).setAttribute(ConstantsUtils.CURRENT_SHOPPING_CART, new HashMap<>());
+            request.getSession(false).setAttribute(ConstantsUtils.CURRENT_ITEMS_CART, new HashMap<>());
 
 
             Gson gson = new Gson();

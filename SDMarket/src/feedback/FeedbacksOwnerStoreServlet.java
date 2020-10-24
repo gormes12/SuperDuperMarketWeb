@@ -37,7 +37,7 @@ public class FeedbacksOwnerStoreServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/pages/main/information.html");
         }
 
-        StoreOwner storeOwner = (StoreOwner) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(username);
+        StoreOwner storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(username);
 
         /*
         Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
@@ -45,7 +45,7 @@ public class FeedbacksOwnerStoreServlet extends HttpServlet {
          */
         Collection<Feedback> feedbacks;
         synchronized (getServletContext()) {
-            feedbacks = storeOwner.getFeedbackFromZone(zoneName);
+            feedbacks = storeOwner.getFeedbacksManager().getFeedbackFromZone(zoneName);
         }
 
         try (PrintWriter out = response.getWriter()) {

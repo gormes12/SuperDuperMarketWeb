@@ -17,7 +17,7 @@ public class SystemManager {
         if (zonesByName.putIfAbsent(zoneName, zone) != null){
             throw new ValueException("There is already an area named " + zoneName);
         } else {
-            zonesManager.addZonesToManagerList(zone.createZoneDTO());
+            zonesManager.addZonesToManagerList(zone);
         }
     }
 

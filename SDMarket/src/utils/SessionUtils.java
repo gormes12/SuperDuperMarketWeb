@@ -20,11 +20,11 @@ public class SessionUtils {
     }
 
     public static void saveOrderInProcess(HttpServletRequest request, Order order){
-        request.getSession(false).setAttribute(ConstantsUtils.CURRENT_SHOPPING_CART, order);
+        request.getSession(false).setAttribute(ConstantsUtils.CURRENT_ITEMS_CART, order);
     }
 
     public static Order getOrderInProcess(HttpServletRequest request){
-        return (Order) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_SHOPPING_CART);
+        return (Order) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_ITEMS_CART);
     }
 
     public static void clearSession (HttpServletRequest request) {

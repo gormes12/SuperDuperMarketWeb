@@ -8,9 +8,9 @@ import java.util.List;
 
 public class ZonesManager {
 
-    private final List<ZoneDTO> zonesList = new ArrayList<>();
+    private final List<ZoneManager> zonesList = new ArrayList<>();
 
-    public synchronized void addZonesToManagerList(ZoneDTO zone){
+    public synchronized void addZonesToManagerList(ZoneManager zone){
         zonesList.add(zone);
     }
 
@@ -18,10 +18,20 @@ public class ZonesManager {
         if (fromIndex < 0 || fromIndex > zonesList.size()) {
             fromIndex = 0;
         }
-        return zonesList.subList(fromIndex, zonesList.size());
+
+        return convertZoneToDTO(zonesList.subList(fromIndex, zonesList.size()));
     }
 
     public int getVersion() {
         return zonesList.size();
+    }
+
+    private List<ZoneDTO> convertZoneToDTO (List<ZoneManager> zoneManagerList){
+        List<ZoneDTO> result = new ArrayList<>();
+        for (ZoneManager zoneManager : zoneManagerList){
+            result.add(zoneManager.createZoneDTO());
+        }
+
+        return result;
     }
 }

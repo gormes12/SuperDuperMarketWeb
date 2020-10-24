@@ -3,6 +3,7 @@ package order;
 import com.google.gson.Gson;
 import dto.SaleDTO;
 import my.project.location.Location;
+import my.project.manager.SystemManager;
 import my.project.manager.ZoneManager;
 import my.project.order.Order;
 import my.project.order.ShoppingCart;
@@ -47,11 +48,14 @@ public class ExecuteOrderServlet extends HttpServlet {
         StoreOwner storeOwner;
         Order orderInProcess = SessionUtils.getOrderInProcess(request);
         zoneManager.executeOrderAndAddToSystem(orderInProcess);
-        customer.addOrder(zoneName, orderInProcess);
+        customer.addOrder(zoneName, orderInProcess.createOrderDTO());
         for (ShoppingCart shoppingCart : orderInProcess.getShoppingCarts().values()) {
             storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(shoppingCart.getStoreDetails().getOwnerName());
+            storeOwner.getOrderManager().addOrder(shoppingCart.createShoppingCartDTO());
             storeOwner.receivingPayment(orderInProcess.getOrderDate(), customer.withdrawalMoney(orderInProcess.getOrderDate(), shoppingCart.getOrderCost()));
         }
+
+        SystemManager.isInnerInfoChangedInSomeZone = true;
 
             /*Gson gson = new Gson();
             String jsonResponse;

@@ -1,10 +1,10 @@
-package order;
+package stores;
 
 import com.google.gson.Gson;
-import dto.OrderDTO;
+import dto.ItemDTO;
+import my.project.location.Location;
 import my.project.manager.ZoneManager;
-import my.project.order.Order;
-import my.project.user.Customer;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -15,12 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
-@WebServlet(name = "CustomerHistoryOrderServlet", urlPatterns = {"/customerHistoryOrders"})
-public class CustomerHistoryOrderServlet extends HttpServlet {
+@WebServlet(name = "OpenStoreFirstDetailsServlet", urlPatterns = {"/openStoreGetFirstDetails"})
+public class OpenStoreFirstDetailsServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -37,29 +36,45 @@ public class CustomerHistoryOrderServlet extends HttpServlet {
         }
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
-        Customer customer = (Customer) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(username);
+
+        try (PrintWriter out = response.getWriter()) {
+
+
+            int xCoordinate = Integer.parseInt(request.getParameter("xCoordinate"));
+            int yCoordinate = Integer.parseInt(request.getParameter("yCoordinate"));
+
+            Location location = new Location(xCoordinate, yCoordinate);
+            if (zoneManager.isLocationCaughtUp(location)) {
+                response.setStatus(500);
+                out.print("This location caught up by store and you can't insert this location");
+                out.flush();
+                return;
+            } else {
+                request.getSession(false).setAttribute(ConstantsUtils.CURRENT_LOCATION, location);
+            }
 
         /*
         Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
-        Collection<OrderDTO> orders;
-        synchronized (getServletContext()) {
-            orders = customer.getOrdersFromZone(zoneName);
-        }
 
-        /*List<OrderDTO> ordersEntries = new ArrayList<>();
 
-        if (orders != null) {
-            for (Order order : orders) {
-                ordersEntries.add(order.createOrderDTO());
+            double ppk = Double.parseDouble(request.getParameter("ppk"));
+            request.getSession(false).setAttribute(ConstantsUtils.NEW_STORE_PPK, ppk);
+
+            request.getSession(false).setAttribute(ConstantsUtils.NEW_STORE_NAME, request.getParameter("storeName"));
+
+            //create items cart
+            request.getSession(false).setAttribute(ConstantsUtils.CURRENT_ITEMS_CART, new HashMap<>());
+
+
+            List<ItemDTO> itemsEntries;
+            synchronized (getServletContext()) {
+                itemsEntries = zoneManager.getItems();
             }
-        }*/
 
-        try (PrintWriter out = response.getWriter()) {
-            // create the response json string
             Gson gson = new Gson();
-            String jsonResponse = gson.toJson(/*ordersEntries*/orders);
+            String jsonResponse = gson.toJson(itemsEntries);
 
             out.print(jsonResponse);
             out.flush();

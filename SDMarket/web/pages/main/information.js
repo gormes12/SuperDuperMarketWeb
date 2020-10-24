@@ -50,10 +50,10 @@ function ajaxZonesContent() {
              }
              */
             console.log("Server Zones version: " + data.version + ", Current zones version: " + zonesVersion);
-            if (data.version !== zonesVersion) {
+            // if (data.version !== zonesVersion) {
                 zonesVersion = data.version;
                 appendToZonesInfo(data.entries);
-            }
+            // }
             triggerAjaxZonesContent();
         },
         error: function(error) {
@@ -72,13 +72,13 @@ function appendToZonesInfo(entries) {
     $.each(entries || [], function (index, entry) {
         $("<div class=\"w3-quarter w3-margin\">" +
                 "<div class=\"w3-card w3-container w3-round-xlarge w3-light-blue\">" +
-                    "<h3 class=\"w3-center\">" + entry.zoneName + "</h3><br>" +
+                    "<h3 class=\"w3-center\">" + entry.zoneName + "</h3>" +
                     "<p> Owner: " + entry.ownerName + "</p>" +
                     "<p> Total Item Type: " + entry.totalItemType + "</p>" +
                     "<p> Total Stores: " + entry.totalStores + "</p>" +
                     "<p> Total Orders: " + entry.totalOrders + "</p>" +
-                    "<p> Average Order Price: " + entry.avgOrderPrice + "</p>" +
-                    "<form action='passScreen' method='post' class='pass-screen'>" +
+                    "<p> Average Order Price: " + entry.avgOrderPrice.toFixed(2) + "</p>" +
+                    "<form action='passScreen' method='post' class='pass-screen' style='padding-bottom: 8px'>" +
                         "<input name='chooseZone' value=\"" + entry.zoneName + "\" style='display: none'/>" +
                         "<input type='submit' value='Enter'/>" +
                     "</form>" +
@@ -123,8 +123,6 @@ function refreshUsersList(users) {
     // rebuild the list of users: scan all users and add them to the list of users
     $.each(users || [], function(index, user) {
         console.log("Adding user #" + index + ": " + user);
-        //create a new <option> tag with a value in it and
-        //appeand it to the #userslist (div with id=user-list) element
         $('<li>' + user.username + ": " + user.userType + '</li>').appendTo(userList);
     });
 }
@@ -134,6 +132,9 @@ function ajaxUsersList() {
         url: USER_LIST_URL,
         success: function(users) {
             refreshUsersList(users);
+        },
+        error: function (){
+            console.log("error");
         }
     });
 }

@@ -41,7 +41,7 @@ public class AddFeedbackOwnerStoreServlet extends HttpServlet {
         LocalDate date = (LocalDate) request.getSession(false).getAttribute(ConstantsUtils.DATE_ORDER);
 
         StoreOwner storeOwner = (StoreOwner) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(zoneManager.getStoreOwnerName(storeID));
-        storeOwner.addFeedback(zoneName, username, date, rate, textRate);
+        storeOwner.getFeedbacksManager().addFeedback(zoneName, username, date, rate, textRate);
 
     }
 

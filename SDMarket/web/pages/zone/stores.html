@@ -6,12 +6,13 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="../../css/feedback.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> //add for quotes.
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="../../common/jquery-2.0.3.min.js"></script>
     <script src="../../common/context-path-helper.js"></script>
     <script src="stores.js"></script>
+    <script src="../../common/alerts.js"></script>
 
     <title>Super Duper Market</title>
     <script>
@@ -57,7 +58,7 @@
 <div class="w3-container" id="main">
     <div id="tabs-row" class="w3-row">
         <a href="javascript:void(0)" onclick="openTab(event, 'itemsAndStores');">
-            <div class="w3-quarter tablink w3-bottombar w3-hover-light-grey w3-padding w3-border-red" style="width:200px">Items & Stores</div>
+            <div class="w3-quarter tablink w3-bottombar w3-hover-light-grey w3-padding w3-border-light-blue" style="width:200px">Items & Stores</div>
         </a>
     </div>
 
@@ -125,102 +126,7 @@
     <!------ make Order tab option ------>
 
     <div id="make-order" class="tab-option" >
-       <!-- <form class="w3-container w3-card-4 w3-light-grey"  method="get" action="order" id="orderform">
 
-            <p>
-                <label>Pick a date</label>
-                <input style="max-width: 200px" class="w3-input w3-border w3-round" type="date" id="date-to-order" name="date-to-order" min="2020-01-01" required>
-            </p>
-            <p>
-                <label>Location</label><br>
-                <label>X:</label>
-                <input  id="xCoordinate" name="xCoordinate" type="number" step="1" min="1" max="50" required>
-                <label>Y:</label>
-                <input id="yCoordinate" name="yCoordinate" type="number" step="1" min="1" max="50" required>
-            </p>
-            <p>
-                <label>Order Type</label><br>
-                    <input type="radio" name="order-type" value="static" checked onclick="showStoresForStaticOrder()">
-                <label>Static Order</label>
-                <input type="radio" name="order-type" value="dynamic" onclick="hideStoresForStaticOrder()">
-                <label>Dynamic Order</label>
-            </p>
-            <p>
-                <div id="stores-for-static-order">
-
-                </div>
-            </p>
-            <p>
-                <label id="error-screen-one-order-label" class="w3-red"></label>
-            </p>
-            <p class="w3-cell-bottommiddle">
-                <button  type="submit" style="border:none ;background:transparent"> <i class="material-icons w3-xxlarge ">arrow_forward</i></button>
-            </p>
-        </form>-->
-
-        <!--<div class="w3-card-4" style="width: 71%">
-
-            <header class="w3-container w3-deep-orange">
-                <h6><b>Store Name: Rami</b></h6>
-                <span>Store ID: 1 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;</span>  <span>  PPK: 0.00 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;</span>
-                <span>Distance from customer: 9.85 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;</span>  <span>Delivery cost to customer: 98.49</span><br>
-                <span style="visibility: hidden">enter</span>
-            </header>
-
-            <div class="w3-container">
-                <table class="w3-table w3-striped w3-centered" >
-                    <tr class="">
-                        <th>Serial No.</th>
-                        <th>Item Name</th>
-                        <th>Purchase Category</th>
-                        <th>Quantity</th>
-                        <th>Price (per unit)</th>
-                        <th>Total Price</th>
-                        <th>From Sale</th>
-                    </tr>
-                    <tr class="">
-                        <td>1</td>
-                        <td>Toilet Paper</td>
-                        <td>Quantity</td>
-                        <td>1.22</td>
-                        <td>10.00</td>
-                        <td>10.00</td>
-                        <td>&#10003;</td>
-                    </tr>
-                    <tr class="">
-                        <td>1</td>
-                        <td>Toilet Paper</td>
-                        <td>Quantity</td>
-                        <td>1.22</td>
-                        <td>10.00</td>
-                        <td>10.00</td>
-                        <td>&#10003;</td>
-                    </tr>
-                    <tr class="">
-                        <td>1</td>
-                        <td>Toilet Paper</td>
-                        <td>Quantity</td>
-                        <td>1.22</td>
-                        <td>10.00</td>
-                        <td>10.00</td>
-                        <td>&#10007;</td>
-                    </tr>
-                    <tr class="">
-                        <td>1</td>
-                        <td>Toilet Paper</td>
-                        <td>Quantity</td>
-                        <td>1.22</td>
-                        <td>10.00</td>
-                        <td>10.00</td>
-                        <td>&#10007;</td>
-                    </tr>
-                </table><br>
-            </div>
-
-            <span class="w3-button w3-block w3-dark-grey">Thank You</span>
-
-        </div><br>
-       -->
         <div class="w3-third w3-container w3-card" style="visibility: hidden; display: none">
             <h4 style="padding-left: 17px">Summary Order</h4>
 
@@ -246,43 +152,6 @@
             </p>
         </div>
         <div id="order-items" class="w3-rest w3-container w3-margin">
-            <!--<div class="w3-card-4 " style="max-width: 70%; height: 90px">
-                <div class="w3-col w3-left w3-margin-right w3-margin-left" style="width:15%">
-                    <img  src="../../imageAndIcon/barcode.png" style="height: 80px" alt="transaction">
-                </div>
-                <div class="w3-col w3-rest" style="width:30%">
-                    <span class="w3-opacity">Banana</span><br>
-                    <span class="w3-opacity">Serial No. 1</span><br>
-                    <span class="w3-text-blue">15.00&nbsp;₪</span>
-                </div>
-                <div class="w3-col w3-right" style="width:35%">
-                    <form>
-                        <label>Qty:</label>
-                        <input type="number" step="0.100" min="0.1" max="50" style="width:60px" required>
-                        <button type="submit" class="w3-button w3-circle w3-black w3-margin">+</button>
-                    </form>
-                </div>
-            </div>
-            <hr style="max-width: 70%">-->
-          <!--          <form class="w3-row" id="add-item-to-cart-form" method="get">
-            <div class="w3-card-4" style="width: 70%; height: 90px">
-                <div class="w3-col w3-left w3-margin-right w3-margin-left" style="width:15%">
-                    <img src="../../imageAndIcon/barcode.png" style="max-height: 80px" alt="barcode">
-                </div>
-                <div class="w3-col w3-rest " style="width:30%">
-                    <span class="w3-opacity">Banana</span><br>
-                    <span class="w3-opacity ">Serial No. 7</span><br>
-                    <span class="w3-text-blue w3-margin-top">15.00&nbsp;₪</span>
-                </div>
-                <div class="w3-col w3-right" style="width:35%">
-                        <label>Qty:</label>
-                        <input type="number" step="0.100" min="0.1" max="50" style="width:60px" required>
-                        <button type="submit" class="w3-button w3-circle w3-black w3-margin">+</button>
-                    <span class="w3-text-red" style="font-size: 13px; display: none">must integer number</span>
-                </div>
-            </div>
-                    </form>
-            <hr style="max-width: 70%">-->
 
         </div>
     </div>
@@ -294,105 +163,14 @@
             <div id="customer-order-details-table" style='display: flex; justify-content: center'>
 
             </div>
-            <div id="items-customer-order-details">
+            <div id="items-customer-order-details" >
 
             </div>
+            <br><br><br><br><br><br>
         </div>
     </div>
 
 </div>
-
-<!--
-<form class="w3-row add-feedback-form " method="get" style="display: flex; justify-content: center">
-    <div class="w3-card-4 w3-round-xlarge w3-padding" style="width:40%">
-        <header class="w3-container w3-light-grey">
-        <img src="../../imageAndIcon/feedback.png"  alt="feedback" class="w3-left  w3-margin-right" style="width:60px">
-        <h3> Maor Gormes </h3>
-        </header>
-        <div class="w3-container">
-            <h6>How Would You Rate This Store?</h6>
-            <p class="star-widget rate">
-                <input type="radio" id="star5" name="rate" value="5" required/>
-                <label for="star5" title="rate">5 stars</label>
-                <input type="radio" id="star4" name="rate" value="4" required/>
-                <label for="star4" title="rate">4 stars</label>
-                <input type="radio" id="star3" name="rate" value="3" required/>
-                <label for="star3" title="rate">3 stars</label>
-                <input type="radio" id="star2" name="rate" value="2" required/>
-                <label for="star2" title="rate">2 stars</label>
-                <input type="radio" id="star1" name="rate" value="1" required/>
-                <label for="star1" title="rate">1 star</label>
-            </p>
-            <p class="textarea">
-                <textarea cols="30" placeholder="Describe your experience.." ></textarea>
-            </p>
-            <div class="btn">
-                <button class="w3-button w3-block w3-dark-grey" type="submit">Rate</button>
-            </div>
-        </div>
-    </div>
-</form>
-<hr style="width: 40%; display: flex; justify-content: center">
--->
-
-
-<!--
-<form class="w3-row add-item-to-cart-form" method=\"get\">
-    <div class="w3-card-4 w3-third" style="width:35%">
-        <header class="w3-container w3-light-grey">
-            <img src="../../imageAndIcon/sale.png"  alt="barcode" class="w3-left  w3-margin-right" style="width:60px">
-            <h3>Yalla BalaGan</h3>
-        </header>
-        <div class="w3-container">
-            <p>You bought 2 units of Serial No. 7</p>
-            <hr>
-            <span>You deserve:</span><br>
-            <ul>
-                <li> 2 units from Serial No. 5 for 20.00 ₪ per unit</li><br>
-                <li> 2 units from Serial No. 5 for 20.00 ₪ per unit</li><br>
-            </ul>
-        </div>
-        <button class="w3-button w3-block w3-dark-grey">+ Add</button>
-    </div>
-</form>
-<hr style="width:35%">
-<form class="w3-row add-item-to-cart-form" method=\"get\">
-    <div class="w3-card-4 w3-third" style="width:35%">
-        <header class="w3-container w3-light-grey">
-            <img src="../../imageAndIcon/sale.png"  alt="barcode" class="w3-left  w3-margin-right" style="width:60px">
-            <h3>Yalla BalaGan</h3>
-        </header>
-        <div class="w3-container">
-            <p>You bought 2 units of Serial No. 7</p>
-            <hr>
-            <p>You deserve 2 units from Serial No. 5 for 20.00 ₪ per unit</p><br>
-        </div>
-        <button class="w3-button w3-block w3-dark-grey">+ Add</button>
-    </div>
-</form>
-<hr>
--->
-
-
-<!--<form class="w3-row add-item-to-cart-form" method=\"get\">
-<div class="w3-card-4" style="width: 70%; height: 90px">
- <div class="w3-col w3-left w3-margin-right w3-margin-left" style="width:15%">
-<img src="../../imageAndIcon/sale.png" style="max-height: 80px" alt="barcode">
-  </div>
-<div class="w3-col w3-rest " style="width:30%">
-<span value="+item.itemName+" class="w3-opacity itemName">" + item.itemName + "</span><br>
-<span value=+item.serialNumber+" class="w3-opacity serialNumber">Serial No. " + item.serialNumber + "</span><br>
-<span id="+index+" class="w3-text-blue">-</span>
-    </div>
-    <div class="w3-col w3-right" style="width:35%">
-            <label>Qty:</label>
-            <input type="number" name="amount" step="0.100" min="0.1" max="50" style="width:60px" required>
-            <button type="submit" class="w3-button w3-circle w3-black w3-margin">+</button>
-            <span class="w3-text-red error-add-item" style="font-size: 13px"></span>
-    </div>
-</div>
-     </form>
-<hr style="max-width: 70%">-->
 
 </body>
 </html>

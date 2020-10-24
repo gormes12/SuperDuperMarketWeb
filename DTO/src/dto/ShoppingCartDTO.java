@@ -20,6 +20,7 @@ public class ShoppingCartDTO {
     private String customerName;
     private int customerXCoordinate;
     private int customerYCoordinate;
+    private int totalItemsType;
 
 
     public ShoppingCartDTO(int orderID, LocalDate orderDate, List<ShoppingCartItemDTO> items, double deliveryCost,
@@ -38,6 +39,7 @@ public class ShoppingCartDTO {
         customerXCoordinate = customerLocation.x;
         customerYCoordinate = customerLocation.y;
         storePPK = storeDetails.getPricePerKilometer();
+        totalItemsType = getTotalItemTypes();
     }
 
     public String getStoreName(){
@@ -134,5 +136,9 @@ public class ShoppingCartDTO {
 
     public int getCustomerYCoordinate() {
         return customerYCoordinate;
+    }
+
+    public String getCustomerName() {
+        return customerName;
     }
 }

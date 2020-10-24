@@ -12,9 +12,12 @@ var SALES_URL = buildUrlWithContextPath("sales");
 var ADD_SALE_TO_CART = buildUrlWithContextPath("addSaleToCart");
 var SHOW_SUMMARY_ORDER_URL = buildUrlWithContextPath("summaryOrder");
 var EXECUTE_ORDER_URL = buildUrlWithContextPath("executeOrder");
+var EXECUTE_ADD_NEW_STORE_URL = buildUrlWithContextPath("executeAddNewStore");
 var ADD_FEEDBACK_TO_OWNER_STORE = buildUrlWithContextPath("addFeedbackToOwnerStore");
 var CUSTOMER_HISTORY_ORDER_DETAILS_URL = buildUrlWithContextPath("customerHistoryOrders");
 var GET_FEEDBACK_URL = buildUrlWithContextPath("getFeedbacks");
+var SCREEN_ONE_OPEN_STORE = buildUrlWithContextPath("openStoreGetFirstDetails");
+var ADD_ITEM_TO_STORE = buildUrlWithContextPath("addItemToStore");
 
 
 $(function() {
@@ -219,7 +222,7 @@ function appendToStoresInfo(stores) {
 
 
         $(
-            "<div class=\"w3-panel w3-deep-orange w3-round-xlarge \" >" +
+            "<div class=\"w3-panel w3-pale-blue w3-round-xlarge \" >" +
                 "<div class=\"w3-col w3-left\" style='width: 29%'>" +
                     "<p> Store Name: " + store.storeName + "</p>" +
                     "<p> Store Owner: " + store.ownerName + "</p>" +
@@ -231,8 +234,8 @@ function appendToStoresInfo(stores) {
                     "<p> Total Deliveries Revenues: " + store.totalDeliveriesRevenues.toFixed(2) + " ₪</p>" +
                 "</div>" +
                 "<div class=\"w3-rest\">" +
-                    "<table id=\""+store.id+"\" class=\"w3-margin w3-table w3-bordered w3-striped w3-centered w3-text-black\" style=\"max-width: 800px\">" +
-                        "<tr class=\"w3-light-grey\">\n" +
+                    "<table id=\""+store.id+"\" class=\"w3-card w3-margin w3-table w3-bordered w3-striped w3-centered w3-text-black\" style=\"max-width: 800px\">" +
+                        "<tr >\n" +
                             "<th>Serial No.</th>" +
                             "<th>Item Name</th>" +
                             "<th>Purchase Category</th>" +
@@ -449,7 +452,7 @@ function refreshStoresForStaticOrder(stores){
     var detailsTable = $("#stores-order-table");
     $.each(stores || [], function (index, store) {
         $(
-            "<tr onclick='storeChosen("+store.id+")'>" +
+            "<tr id='tr-store" + store.id + "' class='w3-hover-blue' onclick='storeChosen("+store.id+", this)'>" +
             "<td>" + store.id + "</td>" +
             "<td>" + store.storeName + "</td>" +
             "<td> (" + store.xCoordinate + "," + store.yCoordinate + ")</td>" +
@@ -457,11 +460,14 @@ function refreshStoresForStaticOrder(stores){
             "</tr>"
         ).appendTo(detailsTable);
     });
+    $("#tr-store"+ chosenStoreInStaticOrder).addClass("w3-blue");
 
 };
 
-function storeChosen(id){
+function storeChosen(id, tr){
+    $("#tr-store"+ chosenStoreInStaticOrder).removeClass("w3-blue");
     chosenStoreInStaticOrder = id;
+    $(tr).addClass("w3-blue");
 };
 
 function initMakeOrderForm(){
@@ -575,7 +581,7 @@ function showSummaryOrder(order) {
     $.each(order.shoppingCarts || [], function (index, shoppingCart) {
         $(
             "<div class=\"w3-card-4\" style=\"width: 71%\">\n" +
-            "            <header class=\"w3-container w3-deep-orange w3-text-black\">\n" +
+            "            <header class=\"w3-container w3-pale-red w3-text-black\">\n" +
             "                <h5><b>Store Name: " + shoppingCart.storeName + "</b></h5>\n" +
             "                <span>Store ID: " + shoppingCart.storeID + " &nbsp;&nbsp; | &nbsp;&nbsp;</span>" +
             "                <span>PPK: " + shoppingCart.storePPK.toFixed(2) + " ₪ &nbsp;&nbsp; | &nbsp;&nbsp;</span>\n" +
@@ -781,7 +787,7 @@ function addSaleToCart (sale, formSaleOptionId){
             timeout: 2000,
             success: function (salesDetails) {
                 $.each(salesDetails || [], function (index, details) {
-                    addItemToSubCart(details.itemName, details.itemSerialNumber, details.quantity);
+                    addItemToSubCart("sub-cart", "sub-cart-table", details.itemName, details.itemSerialNumber, details.quantity);
                 });
                 refreshOfferSales(sale);
             },
@@ -879,7 +885,7 @@ function initAddItemToCartForm(){
                 },
                 success: function () {
                     $("#error-add-item-s"+chosenserialnumber).text("");
-                    addItemToSubCart(chosenitemName, chosenserialnumber, Amount);
+                    addItemToSubCart("sub-cart", "sub-cart-table", chosenitemName, chosenserialnumber, Amount);
                     if (itemsInCartBeforeAddSales.get(chosenserialnumber) != null){
                         Amount = parseFloat(itemsInCartBeforeAddSales.get(chosenserialnumber)) + parseFloat(Amount);
                     }
@@ -894,15 +900,15 @@ function initAddItemToCartForm(){
 
 };
 
-function addItemToSubCart(chosenitemName, chosenserialnumber, Amount){
-    $("#sub-cart").css('visibility','visible');
+function addItemToSubCart(subCartID, subCartTableID, chosenitemName, chosenserialnumber, Amount){
+    $("#"+subCartID).css('visibility','visible');
     $(
         "<tr>" +
         "<td>"+ chosenserialnumber +"</td>\n" +
         "<td>"+ chosenitemName +"</td>\n" +
         "<td>"+ Amount +"</td>\n" +
         "</tr>"
-    ).appendTo($("#sub-cart-table"));
+    ).appendTo($("#"+subCartTableID));
 
 };
 
@@ -927,11 +933,165 @@ function addRelevantTab() {
                     "<a href=\"javascript:void(0)\" onclick=\"openTab(event, 'feedback-details');\">" +
                     "<div class='w3-quarter tablink w3-bottombar w3-hover-light-grey w3-padding' style='width:200px'>Feedback Details</div>" +
                     "</a>" +
-                    "<a href=\"javascript:void(0)\" onclick=\"openTab(event, 'open-new-store');\">" +
+                    "<a href=\"javascript:void(0)\" onclick=\"setOpenNewStoreTab(); openTab(event, 'open-new-store');\">" +
                     "<div class='w3-quarter tablink w3-bottombar w3-hover-light-grey w3-padding' style='width:200px'>Open New Store</div>" +
                     "</a>"
                 ).appendTo($("#tabs-row"));
             }
+        }
+    });
+};
+
+function setOpenNewStoreTab(){
+    $("#open-new-store").empty();
+    $(
+        "<form class=\"w3-container w3-card w3-round-large w3-padding\" id='openNewStoreForm'>\n" +
+        "<div class=\"w3-container w3-light-blue\">\n" +
+        "  <h4>Fill the following details</h4>\n" +
+        "</div>\n" +
+        "\n" +
+        "  <p>\n" +
+        "  <label><b>Store Name</b></label>\n" +
+        "  <input class=\"w3-input w3-animate-input\" type=\"text\" name='storeName' style=\"width:135px\" required></p>\n" +
+        "  <p>\n" +
+        "       <label><b>Location</b></label><br>\n" +
+        "       <input class=\"w3-input\" id=\"xCoordinate\" name=\"xCoordinate\" type=\"number\" placeholder=\"X:\" step=\"1\" min=\"1\" max=\"50\" required style=\"width: 60px\">\n" +
+        "       &nbsp;\n" +
+        "       <input class=\"w3-input\" id=\"yCoordinate\" placeholder=\"Y:\" name=\"yCoordinate\" type=\"number\" step=\"1\" min=\"1\" max=\"50\" required style=\"width: 60px\">\n" +
+        "  </p>\n" +
+        "  <p>\n" +
+        "       <label><b>PPK</b></label><br>\n" +
+        "       <input class=\"w3-input\" id=\"ppk\" name=\"ppk\" type=\"number\" step=\"any\" required style=\"width:90px\" ></p><br>\n" +
+        "  <p>" +
+        "       <label id=\"error-screen-one-open-store-label\" class=\"w3-text-red\"></label>\n" +
+        "  </p>" +
+        "  <p>" +
+        "       <button type=\"submit\" class=\"w3-button w3-white w3-border w3-round-large\" style=\"width:90px\">Next</button>\n" +
+        "  </p>\n" +
+        "</form>"
+    ).appendTo($("#open-new-store"));
+    initOpenNewStoreForm();
+};
+
+function initOpenNewStoreForm() {
+    $("#openNewStoreForm").submit(function () {
+
+
+        var parameters = $(this).serialize();
+
+        $.ajax({
+            data: parameters,
+            url: SCREEN_ONE_OPEN_STORE,
+            timeout: 7000,
+            error: function (res) {
+                $("#error-screen-one-open-store-label").text(res.responseText);
+            },
+            success: function (items) {
+                chooseItemsToNewStore(items);
+            }
+        });
+
+        // by default - we'll always return false so it doesn't redirect the user.
+        return false;
+    });
+};
+
+function chooseItemsToNewStore(items){
+    var openStoreContainer = $("#open-new-store");
+    openStoreContainer.empty();
+    $(
+        "<div id=\"sub-summary\" class=\"w3-third w3-container w3-panel w3-card\" style=\"visibility: hidden; display: none\">\n" +
+        "            <h4 style=\"padding-left: 17px\">Items In Store</h4>\n" +
+        "            <table id=\"sub-summary-table\" class=\"w3-table w3-striped w3-center\">\n" +
+        "                <tr class=\"\">\n" +
+        "                    <th>Serial No.</th>\n" +
+        "                    <th>Name</th>\n" +
+        "                    <th>Price</th>\n" +
+        "                </tr>\n" +
+        "            </table><br>\n" +
+        "            <p class=\"w3-cell-bottomright\">\n" +
+        "                <button onclick='addNewStore()' style=\"border:none ;background:transparent\"> <i class=\"material-icons w3-xxlarge \">arrow_forward</i></button>\n" +
+        "            </p>\n" +
+        " </div>\n" +
+        " <div id=\"newStore-items\" class=\"w3-rest w3-container w3-margin\">"+
+        " </div>"
+    ).appendTo(openStoreContainer);
+
+    $("#sub-summary").show();
+    var newStoreItems = $("#newStore-items");
+
+    $.each(items || [], function (index, item) {
+        $(
+            "        <form class=\"w3-row add-item-to-store-form\" method=\"get\">" +
+            "<div class=\"w3-card-4\" style=\"width: 700px; height: 110px\">" +
+            "    <div class=\"w3-col w3-left w3-margin-right w3-margin-left\" style=\"width:15%\">\n" +
+            "        <img src=\"../../imageAndIcon/barcode.png\" style=\"max-height: 80px\" alt=\"barcode\">\n" +
+            "    </div>" +
+            "    <div class=\"w3-col w3-rest \" style=\"width:40%\">" +
+            "        <span value=\""+item.itemName+"\" class=\"w3-opacity itemName\">" + item.itemName + "</span><br>" +
+            "        <span value=\""+item.serialNumber+"\" class=\"w3-opacity serialNumber\">Serial No. " + item.serialNumber + "</span><br>" +
+            "        <span class=\"w3-opacity serialNumber\">Purchase Category: " + item.purchaseCategory + "</span><br>" +
+            "        <span class=\"w3-text-blue\">Average Price: " + item.averagePrice.toFixed(2) + "</span>"+
+            "    </div>" +
+            "    <div class=\"w3-col w3-right\" style=\"width:35%\">" +
+            "            <label>Price:</label>" +
+            "            <input type=\"number\" name=\"price\" step=\"any\" min='0.1' style=\"width:95px\" required>\n" +
+            "            <button type=\"submit\" class=\"w3-button w3-circle w3-black w3-margin\">+</button><br>" +
+            "            <span id=error-add-item-to-store-s"+item.serialNumber+ " style=\"font-size: 13px\"></span>" +
+            "    </div>" +
+            "</div>" +
+            "        </form>" +
+            "<hr style=\"max-width: 70%\">"
+        ).appendTo(newStoreItems);
+    });
+
+    initAddItemToStoreForm();
+};
+
+function initAddItemToStoreForm() {
+    $(".add-item-to-store-form").submit(function () {
+
+        var parameters = $(this).serialize();
+        var Price = $(this).find("input[name=price]").val();
+        var chosenserialnumber = $(this).find(".serialNumber").attr('value');
+        var chosenitemName = $(this).find(".itemName").attr('value');
+
+        $.ajax({
+            data: parameters + "&serialnumber=" + chosenserialnumber,
+            url: ADD_ITEM_TO_STORE,
+            timeout: 2000,
+            error: function (res) {
+                $("#error-add-item-to-store-s" + chosenserialnumber).text(res.responseText).removeClass("w3-text-green").addClass("w3-text-red");
+            },
+            success: function () {
+                $("#error-add-item-to-store-s" + chosenserialnumber).text("item added successfully").removeClass("w3-text-red").addClass("w3-text-green");
+                addItemToSubCart("sub-summary", "sub-summary-table", chosenitemName, chosenserialnumber, Price);
+            }
+        });
+
+        // by default - we'll always return false so it doesn't redirect the user.
+        return false;
+    });
+};
+
+function addNewStore(){
+    $.ajax({
+        url: EXECUTE_ADD_NEW_STORE_URL,
+        success: function() {
+            console.log("New Store Added!");
+            $("#sub-summary").empty();
+            $("#newStore-items").empty();
+            $(
+                "<div class=\"w3-card-4 w3-round-xlarge w3-padding\" style=\"width:40%\">\n" +
+                "<header> " +
+                "<h6>Store Added Successfully</h6>" +
+                "</header> " +
+                // "<div><label> The feedback to store named " + storeName + ", id - " + storeID + " was sent successfully! </label></div>" +
+                "</div>"
+            ).appendTo($("#newStore-items"));
+        },
+        error: function (error){
+            console.log(error.responseText);
         }
     });
 };
@@ -983,9 +1143,9 @@ function openTab(evt, tab) {
         x[i].style.display = "none";
     }
 
-    $(".tablink").removeClass("w3-border-red").addClass("");
+    $(".tablink").removeClass("w3-border-light-blue").addClass("");
     document.getElementById(tab).style.display = "block";
-    evt.currentTarget.firstElementChild.className += " w3-border-red";
+    evt.currentTarget.firstElementChild.className += " w3-border-light-blue";
 };
 
 function ajaxCustomerHistoryOrders() {
@@ -1003,7 +1163,7 @@ function ajaxCustomerHistoryOrders() {
 
                 orderDetailsTable.empty();
 
-                if (orders.length !== 0) {
+                if (orders !== null) {
                     appendOrdersToCustomerDetailsTable(orders);
                 } else{
                     // $("#customer-order-details-table").empty();
@@ -1024,9 +1184,9 @@ function appendOrdersToCustomerDetailsTable(orders){
 
     $(
         "<table id=\"customer-details-table\" class=\"w3-margin w3-table w3-bordered w3-striped w3-centered\" style=\"max-width: 70%\"> <!---->" +
-        "<tr class=\"w3-light-grey\">\n" +
+        "<tr class=\"w3-dark-grey\">\n" +
         "<th>No. Order</th>" +
-        "<th>Date</th>" +
+        "<th style='min-width: 120px'>Date</th>" +
         "<th>Order Destination</th>" +
         "<th>No. Stores Purchased From</th>" +
         "<th>No. Items Purchased</th>" +
@@ -1064,18 +1224,20 @@ function showCustomerOrderItems(shoppingCarts, orderID){
 
     $(
         "<br><h5>Items Details For Order No. " + orderID + ":</h5><br>" +
-        "<table id=\"items-table\" class=\"w3-table w3-striped w3-centered\" style=\"max-width: 800px\">" +
-        "<tr class=\"w3-light-grey\">\n" +
-        "<th>Serial No.</th>" +
-        "<th>Name</th>" +
-        "<th>Purchase Category</th>" +
-        "<th>Store</th>" +
-        "<th>Quantity</th>" +
-        "<th>Price (Per Unit)</th>" +
-        "<th>Total Price</th>" +
-        "<th>From Sale</th>" +
-        "</tr>" +
-        "</table>"
+        "<div style='display: flex; justify-content: center'>" +
+            "<table id=\"items-table\" class=\"w3-table w3-card w3-striped w3-centered\" style=\"max-width: 800px; \">" +
+            "<tr class=\"w3-pale-blue\">\n" +
+            "<th>Serial No.</th>" +
+            "<th>Name</th>" +
+            "<th>Purchase Category</th>" +
+            "<th>Store</th>" +
+            "<th>Quantity</th>" +
+            "<th>Price (Per Unit)</th>" +
+            "<th>Total Price</th>" +
+            "<th>From Sale</th>" +
+            "</tr>" +
+            "</table>" +
+        "</div>"
     ).appendTo(itemsDetailsTable);
 
     var detailsTable = $("#items-table");

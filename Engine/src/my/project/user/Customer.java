@@ -14,7 +14,7 @@ import java.util.List;
 public class Customer extends User {
 
     private Location location;
-    private HashMap<String, List<Order>> orders; // String: ZoneName
+    private HashMap<String, List<OrderDTO>> orders; // String: ZoneName
 
     public Customer(int id, String username) {
         super(id,username, eUserType.Customer);
@@ -39,8 +39,8 @@ public class Customer extends User {
         this.location = location;
     }
 
-    public void addOrder(String zoneName, Order order) {
-        List<Order> orderList = orders.getOrDefault(zoneName, null);
+    public void addOrder(String zoneName, OrderDTO order) {
+        List<OrderDTO> orderList = orders.getOrDefault(zoneName, null);
         if (orderList == null){
             orderList = new LinkedList<>();
         }
@@ -49,7 +49,7 @@ public class Customer extends User {
         orders.put(zoneName, orderList);
     }
 
-    public Collection<Order> getOrdersFromZone(String zoneName) {
+    public Collection<OrderDTO> getOrdersFromZone(String zoneName) {
         return orders.get(zoneName);
     }
 

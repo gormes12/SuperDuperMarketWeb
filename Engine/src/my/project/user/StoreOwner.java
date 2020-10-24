@@ -1,6 +1,12 @@
 package my.project.user;
 
+import dto.OrderDTO;
+import dto.ShoppingCartDTO;
+import dto.StoreDTO;
+import dto.ZoneDTO;
 import feedback.Feedback;
+import my.project.manager.FeedbackManager;
+import my.project.manager.OrderManager;
 import my.project.order.Order;
 
 import java.time.LocalDate;
@@ -8,11 +14,15 @@ import java.util.*;
 
 public class StoreOwner extends User{
 
-    private HashMap<String, List<Feedback>> feedbacks;
+    private final OrderManager orderManager;
+    private final FeedbackManager feedbacksManager;
+    private final List<StoreDTO> competitiveStoresInMyZone;
 
     public StoreOwner(int id, String username) {
         super(id, username, eUserType.StoreOwner);
-        feedbacks = new HashMap<>();
+        feedbacksManager = new FeedbackManager();
+        orderManager = new OrderManager();
+        competitiveStoresInMyZone = new ArrayList<>();
     }
 
     @Override
@@ -20,20 +30,26 @@ public class StoreOwner extends User{
         return eUserType.StoreOwner;
     }
 
-    public void addFeedback(String zoneName, String userGiverFeedback, LocalDate date, int rate, String textRate) {
-        List<Feedback> feedbackList = feedbacks.getOrDefault(zoneName, null);
-        if (feedbackList == null){
-            feedbackList = new LinkedList<>();
-        }
-
-        if (textRate.isEmpty()) {
-            textRate = "No Rating text entered";
-        }
-        feedbackList.add(new Feedback(userGiverFeedback, date, rate, textRate));
-        feedbacks.put(zoneName, feedbackList);
+    public OrderManager getOrderManager() {
+        return orderManager;
     }
 
-    public Collection<Feedback> getFeedbackFromZone(String zoneName) {
-        return feedbacks.get(zoneName);
+    public FeedbackManager getFeedbacksManager() {
+        return feedbacksManager;
+    }
+
+    public synchronized void addCompetitiveStore(StoreDTO store){
+        competitiveStoresInMyZone.add(store);
+    }
+
+    public synchronized List<StoreDTO> getCompetitiveStoreEntries(int fromIndex){
+        if (fromIndex < 0 || fromIndex > competitiveStoresInMyZone.size()) {
+            fromIndex = 0;
+        }
+        return competitiveStoresInMyZone.subList(fromIndex, competitiveStoresInMyZone.size());
+    }
+
+    public int getCompetitiveStoresVersion() {
+        return competitiveStoresInMyZone.size();
     }
 }

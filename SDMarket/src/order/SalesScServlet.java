@@ -49,7 +49,7 @@ public class SalesScServlet extends HttpServlet {
 
             LocalDate date = (LocalDate) request.getSession(false).getAttribute(ConstantsUtils.DATE_ORDER);
 
-            HashMap<Integer, Double> shoppingCart = (HashMap<Integer, Double>) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_SHOPPING_CART);
+            HashMap<Integer, Double> shoppingCart = (HashMap<Integer, Double>) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_ITEMS_CART);
 
             Gson gson = new Gson();
             String jsonResponse;

@@ -1,8 +1,6 @@
 package order;
 
-import com.sun.org.apache.xpath.internal.operations.Number;
 import my.project.manager.ZoneManager;
-import my.project.user.User;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
@@ -14,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDate;
 import java.util.HashMap;
 
 @WebServlet(name = "AddItemToCartServlet", urlPatterns = {"/addItemToCart"})
@@ -49,7 +46,7 @@ public class AddItemToCartServlet extends HttpServlet {
             }
         }
 
-        HashMap<Integer, Double> shoppingCart = (HashMap<Integer, Double>) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_SHOPPING_CART);
+        HashMap<Integer, Double> shoppingCart = (HashMap<Integer, Double>) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_ITEMS_CART);
         if (shoppingCart == null) {
             shoppingCart = new HashMap<>();
         }
@@ -61,7 +58,7 @@ public class AddItemToCartServlet extends HttpServlet {
             shoppingCart.put(serialNumber, amount + prevAmount);
         }
 
-        request.getSession(false).setAttribute(ConstantsUtils.CURRENT_SHOPPING_CART, shoppingCart);
+        request.getSession(false).setAttribute(ConstantsUtils.CURRENT_ITEMS_CART, shoppingCart);
 
     }
 

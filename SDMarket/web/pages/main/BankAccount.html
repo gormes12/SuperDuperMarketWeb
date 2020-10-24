@@ -9,6 +9,7 @@
     <script src="../../common/jquery-2.0.3.min.js"></script>
     <script src="../../common/context-path-helper.js"></script>
     <script src="bankAccount.js"></script>
+    <script src="../../common/alerts.js"></script>
 
     <title>Super Duper Market</title>
 
@@ -27,7 +28,7 @@
         }
     </script>
     <script>
-        function openTab(evt, cityName) {
+        function openTab(evt, tabName) {
             var i, x, tablinks;
             x = document.getElementsByClassName("action-transaction");
             for (i = 0; i < x.length; i++) {
@@ -35,10 +36,10 @@
             }
             tablinks = document.getElementsByClassName("tablink");
             for (i = 0; i < x.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" w3-border-red", "");
+                tablinks[i].className = tablinks[i].className.replace(" w3-border-light-blue", "");
             }
-            document.getElementById(cityName).style.display = "block";
-            evt.currentTarget.firstElementChild.className += " w3-border-red";
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.firstElementChild.className += " w3-border-light-blue";
         }
     </script>
 </head>
@@ -63,24 +64,24 @@
 
 <br>
 
-<div class="w3-container" id="main">
+<div class="w3-container" id="main" >
 
     <div id="tabs-row" class="w3-row">
         <a href="javascript:void(0)" onclick="openTab(event, 'transactions');">
-            <div class="w3-quarter tablink w3-bottombar w3-hover-light-grey w3-padding w3-border-red" style="width:200px">Account transactions</div>
+            <div class="w3-quarter tablink w3-bottombar w3-hover-light-grey w3-padding w3-border-light-blue" style="width:200px">Account transactions</div>
         </a>
     </div>
 
     <div id="transactions" class="w3-container action-transaction w3-center w3-content">
-        <div id="no-transactions">
+        <div id="no-transactions" style="display:none">
             <h2>No transactions have been made yet</h2>
             <img src="../../imageAndIcon/transactions.png" class="w3-round" alt="transaction">
         </div>
         <div id="table" style="display: none">
-            <table id="table-transactions" class="w3-margin w3-table w3-bordered w3-striped w3-centered" style="max-width: 800px">
-                <tr class="w3-pale-red">
+            <table id="table-transactions" class="w3-margin w3-table w3-bordered w3-striped w3-centered" style="max-width: 900px">
+                <tr class="w3-pale-blue">
                     <th>Type</th>
-                    <th>Date</th>
+                    <th style="min-width: 90px">Date</th>
                     <th>Transaction's Amount</th>
                     <th>Credit Balance Before</th>
                     <th>Credit Balance After</th>
@@ -89,7 +90,7 @@
         </div>
     </div>
     <div id="deposited" class="w3-container w3-content w3-center action-transaction" style="display:none">
-        <form class="w3-container  w3-card-4 w3-light-grey" style="max-width: 400px" method="get" action="deposit" id="depositform">
+        <form class="w3-container w3-padding w3-margin w3-card-4 w3-light-grey" method="get" action="deposit" id="depositform" style='max-width: 400px'>
             <p class="w3-center">
             <h3>When and how much to deposit</h3>
 
@@ -103,9 +104,11 @@
                 <img class="w3-right" src="../../imageAndIcon/nis.png" style="height: 15px" alt="transaction">
             </div>
             <p>
+                <label id="msg-deposit-label"></label><br>
                 <input type="submit" value="Deposit">
             </p>
         </form>
+        <br><br><br><br><br><br><br><br>
     </div>
     <!--<div class="w3-row-padding">-->
     <!--<div class="w3-quarter">

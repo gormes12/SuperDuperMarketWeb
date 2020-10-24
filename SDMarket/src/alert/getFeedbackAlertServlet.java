@@ -1,10 +1,13 @@
-package order;
+package alert;
 
 import com.google.gson.Gson;
-import dto.OrderDTO;
-import my.project.manager.ZoneManager;
-import my.project.order.Order;
-import my.project.user.Customer;
+import dto.ShoppingCartDTO;
+import feedback.Feedback;
+import my.project.manager.FeedbackManager;
+import my.project.manager.OrderManager;
+import my.project.user.StoreOwner;
+import my.project.user.User;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -15,12 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-@WebServlet(name = "CustomerHistoryOrderServlet", urlPatterns = {"/customerHistoryOrders"})
-public class CustomerHistoryOrderServlet extends HttpServlet {
+@WebServlet(name = "getFeedbackAlertServlet", urlPatterns = {"/getFeedbackAlert"})
+public class getFeedbackAlertServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -31,39 +32,48 @@ public class CustomerHistoryOrderServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
 
-        String zoneName = SessionUtils.getChosenZoneName(request);
-        if (zoneName == null) {
-            response.sendRedirect(request.getContextPath() + "/pages/main/information.html");
+        if (ServletUtils.getSystemManager(request.getServletContext()).getUserType(username).equals(User.eUserType.Customer)){
+            return;
         }
 
-        ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
-        Customer customer = (Customer) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(username);
+        /*
+        verify chat version given from the user is a valid number. if not it is considered an error and nothing is returned back
+         */
+        int feedbackAlertVersion = (int) request.getSession(false).getAttribute(ConstantsUtils.FEEDBACK_ALERT_VERSION_PARAMETER);
+        if (feedbackAlertVersion == ConstantsUtils.INT_PARAMETER_ERROR) {
+            return;
+        }
+
+        StoreOwner storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(username);
+        FeedbackManager storeOwnerFeedbacksManager = storeOwner.getFeedbacksManager();
 
         /*
         Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
-        Collection<OrderDTO> orders;
+        int feedbackAlertStoreOwnerVersion = 0;
+        List<Feedback> feedbacksEntries;
         synchronized (getServletContext()) {
-            orders = customer.getOrdersFromZone(zoneName);
+            feedbackAlertStoreOwnerVersion = storeOwnerFeedbacksManager.getVersion();
+            feedbacksEntries = storeOwnerFeedbacksManager.getFeedbacksEntries(feedbackAlertVersion);
         }
 
-        /*List<OrderDTO> ordersEntries = new ArrayList<>();
+        if (feedbackAlertStoreOwnerVersion == feedbackAlertVersion){
+            return;
+        } else {
+            request.getSession(false).setAttribute(ConstantsUtils.FEEDBACK_ALERT_VERSION_PARAMETER, feedbackAlertStoreOwnerVersion);
+        }
 
-        if (orders != null) {
-            for (Order order : orders) {
-                ordersEntries.add(order.createOrderDTO());
-            }
-        }*/
+        // create the response json string
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(feedbacksEntries);
+
 
         try (PrintWriter out = response.getWriter()) {
-            // create the response json string
-            Gson gson = new Gson();
-            String jsonResponse = gson.toJson(/*ordersEntries*/orders);
-
             out.print(jsonResponse);
             out.flush();
         }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

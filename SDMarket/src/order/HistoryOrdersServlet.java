@@ -45,6 +45,7 @@ public class HistoryOrdersServlet extends HttpServlet {
                 response.setStatus(500);
                 out.print("You are not the owner of this store!" + System.lineSeparator() + "You have no accesses to see it orders.");
                 out.flush();
+                return;
             }
 
             List<ShoppingCartDTO> ordersEntries;

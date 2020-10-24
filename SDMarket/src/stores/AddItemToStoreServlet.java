@@ -1,10 +1,7 @@
-package order;
+package stores;
 
-import com.google.gson.Gson;
-import dto.OrderDTO;
 import my.project.manager.ZoneManager;
-import my.project.order.Order;
-import my.project.user.Customer;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -15,16 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
 
-@WebServlet(name = "CustomerHistoryOrderServlet", urlPatterns = {"/customerHistoryOrders"})
-public class CustomerHistoryOrderServlet extends HttpServlet {
-    private void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+@WebServlet(name = "AddItemToStoreServlet", urlPatterns = {"/addItemToStore"})
+public class AddItemToStoreServlet extends HttpServlet {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        response.setContentType("application/json");
+        response.setContentType("text/html;charset=UTF-8");
 
         String username = SessionUtils.getUsername(request);
         if (username == null) {
@@ -37,39 +31,32 @@ public class CustomerHistoryOrderServlet extends HttpServlet {
         }
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
-        Customer customer = (Customer) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(username);
 
-        /*
-        Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
-        Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
-         */
-        Collection<OrderDTO> orders;
-        synchronized (getServletContext()) {
-            orders = customer.getOrdersFromZone(zoneName);
+        Integer serialNumber = Integer.parseInt(request.getParameter("serialnumber"));
+        Double price = Double.parseDouble(request.getParameter("price"));
+
+
+        HashMap<Integer, Double> shoppingCart = (HashMap<Integer, Double>) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_ITEMS_CART);
+        if (shoppingCart == null) {
+            shoppingCart = new HashMap<>();
         }
 
-        /*List<OrderDTO> ordersEntries = new ArrayList<>();
-
-        if (orders != null) {
-            for (Order order : orders) {
-                ordersEntries.add(order.createOrderDTO());
+        if (shoppingCart.putIfAbsent(serialNumber, price) != null) {
+            try (PrintWriter out = response.getWriter()) {
+                response.setStatus(500);
+                out.print("You Already add this item");
+                out.flush();
+                return;
             }
-        }*/
-
-        try (PrintWriter out = response.getWriter()) {
-            // create the response json string
-            Gson gson = new Gson();
-            String jsonResponse = gson.toJson(/*ordersEntries*/orders);
-
-            out.print(jsonResponse);
-            out.flush();
         }
+
+        request.getSession(false).setAttribute(ConstantsUtils.CURRENT_ITEMS_CART, shoppingCart);
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -83,7 +70,6 @@ public class CustomerHistoryOrderServlet extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -97,7 +83,6 @@ public class CustomerHistoryOrderServlet extends HttpServlet {
 
     /**
      * Returns a short description of the servlet.
-     *
      * @return a String containing servlet description
      */
     @Override

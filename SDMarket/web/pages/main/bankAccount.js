@@ -7,7 +7,8 @@ var DEPOSIT_MONEY_URL = buildUrlWithContextPath("deposit");
 
 $(function() {
     addDepositedTab();
-    triggerAjaxTransactionContent();
+    ajaxTransactionContent();
+    // triggerAjaxTransactionContent();
     initDepositMoneyForm();
 });
 
@@ -20,7 +21,7 @@ function ajaxTransactionContent() {
         url: TRANSACTION_LIST_URL,
         data: "transactionversion=" + transactionVersion,
         dataType: 'json',
-        success: function(data) {
+        success: function (data) {
             /*
              data will arrive in the next form:
              {
@@ -45,23 +46,27 @@ function ajaxTransactionContent() {
              */
             console.log("Server Transaction version: " + data.version + ", Current Transaction version: " + transactionVersion);
             if (data.version !== transactionVersion) {
-                if (data.version !== 0){
+                if (data.version !== 0) {
                     // document.getElementById("no-transactions").style.display = "block";
                     $("#no-transactions").hide();
                     // $("#table").attr('style', 'display:block;');
                     $("#table").show();
-                } else{
                 }
+
                 transactionVersion = data.version;
                 appendToTransactionInfo(data.entries);
             }
+            else if (transactionVersion === 0) {
+                $("#no-transactions").show();
+            }
+
             triggerAjaxTransactionContent();
         },
-        error: function(error) {
+        error: function (error) {
             triggerAjaxTransactionContent();
         }
     });
-}
+};
 
 function appendToTransactionInfo(entries) {
     var tableTransactionsInfo = $("#table-transactions");
@@ -72,9 +77,9 @@ function appendToTransactionInfo(entries) {
           "<tr>" +
              "<td>" + entry.type + "</td>" +
              "<td>" + entry.date + "</td>" +
-             "<td>" + entry.amount + "</td>" +
-             "<td>" + entry.creditBalanceBefore + "</td>" +
-             "<td>" + entry.creditBalanceAfter + "</td>" +
+             "<td>" + entry.amount.toFixed(2) + "</td>" +
+             "<td>" + entry.creditBalanceBefore.toFixed(2) + "</td>" +
+             "<td>" + entry.creditBalanceAfter.toFixed(2) + "</td>" +
           "</tr>"
          ).appendTo(tableTransactionsInfo);
     });
@@ -96,6 +101,7 @@ function addDepositedTab() {
 function initDepositMoneyForm() {
     $("#depositform").submit(function () {
         var parameters = $(this).serialize();
+        var msgLabel = $("#msg-deposit-label");
 
         $.ajax({
             data: parameters,
@@ -103,11 +109,11 @@ function initDepositMoneyForm() {
             timeout: 2000,
             error: function () {
                 console.error("Failed to submit");
+                msgLabel.text("Error: Your account not deposit!").removeClass("w3-text-green").addClass("w3-text-red");
             },
             success: function (r) {
-                //do not add the user string to the chat area
-                //since it's going to be retrieved from the server
-                //$("#result h1").text(r);
+
+                msgLabel.text("Your account deposit successfully!").removeClass("w3-text-red").addClass("w3-text-green");
             }
         });
 
@@ -116,3 +122,4 @@ function initDepositMoneyForm() {
         return false;
     });
 };
+

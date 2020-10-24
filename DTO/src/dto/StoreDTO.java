@@ -18,6 +18,7 @@ public class StoreDTO {
     private double totalItemsSoldRevenues;
     private final int xCoordinate;
     private final int yCoordinate;
+    private int totalSuperMarketItemsAmount = 0;
 
 
 
@@ -41,6 +42,9 @@ public class StoreDTO {
         totalDeliveriesRevenues = deliveriesRevenues;
         if (orders!=null) {
             totalItemsSoldRevenues = calculateItemsSoldRevenues(orders);
+        }
+        if (superMarketItems != null) {
+            totalSuperMarketItemsAmount = superMarketItems.size();
         }
     }
 

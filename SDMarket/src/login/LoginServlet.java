@@ -67,6 +67,11 @@ public class LoginServlet extends HttpServlet {
                         //the true parameter means that if a session object does not exists yet
                         //create a new one
                         request.getSession(true).setAttribute(ConstantsUtils.USERNAME, usernameFromParameter);
+                        if (usertypeFromParameter.equals("StoreOwner")){
+                            request.getSession(false).setAttribute(ConstantsUtils.ORDER_ALERT_VERSION_PARAMETER, 0);
+                            request.getSession(false).setAttribute(ConstantsUtils.FEEDBACK_ALERT_VERSION_PARAMETER, 0);
+                            request.getSession(false).setAttribute(ConstantsUtils.NEW_STORE_ALERT_VERSION_PARAMETER, 0);
+                        }
 
                         //redirect the request to the chat room - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());
