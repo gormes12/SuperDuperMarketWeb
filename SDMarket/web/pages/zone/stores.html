@@ -65,7 +65,7 @@
 <!------   common tab for customer & Store Owner ------>
 
     <div id="itemsAndStores" class="tab-option" >
-        <div class="w3-row w3-content w3-center" id="items">
+        <div class="w3-row w3-content w3-center w3-padding" id="items">
             <div class="w3-content w3-display-container w3-cell-middle" id="items-info" style='display: flex; justify-content: center'>
 
             </div>
@@ -88,25 +88,26 @@
   <!------ tab option for Store Owner ------>
 
         <!------ order details tab option ------>
-    <div id="order-details" class="tab-option" style="display:none">
-        <div class="w3-row">
+    <div id="order-details" class="tab-option w3-padding" style="display:none">
+        <div class="w3-row" style="display: flex; justify-content: center">
             <form action="" id="ShowOrderDetailsForm">
                 <label for="stores">Choose a store:</label>
                 <select class="w3-round" name="stores" id="stores">
 
                 </select>
-                <br><br>
-                <input type="submit" value="Show Details">
+<!--                <br><br>-->
+                <input class="w3-button w3-small w3-round-xxlarge" type="submit" value="Show Details">
             </form>
         </div>
-        <div class="w3-row">
-            <div id="order-details-table">
+        <div class="w3-row" >
+            <div id="order-details-table" style="display: flex; justify-content: center">
 
             </div>
-            <div id="items-order-details">
+            <div class="w3-center" id="items-order-details" >
 
             </div>
         </div>
+        <br><br><br>
     </div>
 
         <!------ feedback details tab option ------>
@@ -127,7 +128,7 @@
 
     <div id="make-order" class="tab-option" >
 
-        <div class="w3-third w3-container w3-card" style="visibility: hidden; display: none">
+        <!--<div class="w3-third w3-container w3-card" style="visibility: hidden; display: none">
             <h4 style="padding-left: 17px">Summary Order</h4>
 
 
@@ -136,8 +137,8 @@
                     <i class="material-icons w3-xxlarge ">arrow_forward</i>
                 </button>
             </p>
-        </div>
-        <div id="sub-cart" class="w3-third w3-container w3-card" style="visibility: hidden; display: none">
+        </div>-->
+        <div id="sub-cart" class="w3-third w3-panel w3-card" style="visibility: hidden; display: none">
             <h4 style="padding-left: 17px">Shopping Cart</h4>
             <table id="sub-cart-table" class="w3-table w3-striped w3-center">
                 <tr class="">

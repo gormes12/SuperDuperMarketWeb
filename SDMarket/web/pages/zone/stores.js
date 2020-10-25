@@ -203,26 +203,13 @@ function appendToStoresInfo(stores) {
     storesInfo.empty();
 
     $.each(stores || [], function (index, store) {
-        /*$(
-            "<button onclick=\"openStoreAccordion('"+store.id+"')\" class=\"w3-btn w3-block w3-light-grey w3-center-align\">"+store.storeName+"</button>" +
-            "<div id=\""+store.id+"\" class=\"w3-container w3-center w3-content w3-hide\">" +
-            "<h4> Store Owner: " + store.ownerName + "</h4><br>" +
-            "<p> Store ID: " + store.id + "</p>" +
-            "<p> Location: (" + store.xCoordinate +","+ store.yCoordinate + ")" + "</p>" +
-            "<p> No. Orders: " + store.orders.length + "</p>" +
-            "<p> Total revenues of items sold: " + store.totalItemsSoldRevenues.toFixed(2) + "</p>" +
-            "<p> PPK: " + store.pricePerKilometer.toFixed(2) + "</p>" +
-            "<p> Total Deliveries Revenues: " + store.totalDeliveriesRevenues.toFixed(2) + "</p>" +
-            "</div>").appendTo(storesInfo);*/
-
         //next sentence only for comboBox
         $(
             "<option value=\"" + store.id +"\">" + store.storeName + "</option>"
         ).appendTo(storesComboBox);
 
-
         $(
-            "<div class=\"w3-panel w3-pale-blue w3-round-xlarge \" >" +
+            "<div class=\"w3-panel w3-pale-blue w3-round-xlarge\">" +
                 "<div class=\"w3-col w3-left\" style='width: 29%'>" +
                     "<p> Store Name: " + store.storeName + "</p>" +
                     "<p> Store Owner: " + store.ownerName + "</p>" +
@@ -308,10 +295,10 @@ function appendOrdersToDetailsTable(shoppingCarts){
     $("#items-order-details").empty();*/
 
     $(
-        "<table id=\"details-table\" class=\"w3-margin w3-table w3-bordered w3-striped w3-centered\" style=\"max-width: 800px\">" +
-            "<tr class=\"w3-light-grey\">\n" +
+        "<table id=\"details-table\" class=\"w3-margin w3-table w3-bordered w3-striped w3-centered\" style=\"max-width: 70%\">" +
+            "<tr class=\"w3-dark-grey\">\n" +
                 "<th>No. Order</th>" +
-                "<th>Date</th>" +
+                "<th style='min-width: 120px'>Date</th>" +
                 "<th>Customer Name</th>" +
                 "<th>Customer Location</th>" +
                 "<th>Total Items Purchased</th>" +
@@ -324,7 +311,7 @@ function appendOrdersToDetailsTable(shoppingCarts){
     var detailsTable = $("#details-table");
     $.each(shoppingCarts || [], function (index, cart) {
         $(
-            "<tr >" +
+            "<tr class=\"w3-hover-blue\">" +
                 "<td>" + cart.orderID + "</td>" +
                 "<td>" + cart.orderDate + "</td>" +
                 "<td>" + cart.customerName + "</td>" +
@@ -346,7 +333,10 @@ function addOrdersItemsToContainer(items, containerID){
     itemsDetailsTable.empty();
 
     $(
-        "<table id=\"items-table-"+ containerID +"\" class=\"w3-table w3-striped w3-centered\" style=\"max-width: 800px\">" +
+        "<h6 class='w3-center'><b>Items Details:</b></h6>" +
+        "<div style='display: flex; justify-content: center'>" +
+        "<table id=\"items-table-"+ containerID +"\" class=\"w3-table w3-padding w3-striped w3-centered\" style=\"max-width: 80%\">" +
+        "<thead>" +
         "<tr class=\"w3-light-grey\">\n" +
         "<th>Serial No.</th>" +
         "<th>Name</th>" +
@@ -356,7 +346,9 @@ function addOrdersItemsToContainer(items, containerID){
         "<th>Total Price</th>" +
         "<th>From Sale</th>" +
         "</tr>" +
-        "</table>"
+        "</thead>" +
+        "</table>" +
+        "</div><br><br>"
     ).appendTo(itemsDetailsTable);
 
     var detailsTable = $("#items-table-"+containerID);
@@ -403,7 +395,7 @@ function appendFeedback(feedbacks){
 
     $.each(feedbacks || [], function (index, feedback) {
         $(
-            "<div class=\"w3-panel w3-card-4 w3-light-grey\" style='width:50%'>\n" +
+            "<div class=\"w3-panel w3-card-4 w3-light-grey w3-round-medium\" style='width:50%'>\n" +
             "  <div class=\"w3-right\"> " + feedback.date + "</div>" +
             "  <div class=\"rate\">" +
             "                <input type=\"radio\" onclick=\"return false;\" id=star5-order" + index + " name=rate" + index + " value=\"5\" />" +
@@ -417,9 +409,9 @@ function appendFeedback(feedbacks){
             "                <input type=\"radio\" onclick=\"return false;\" id=star1-order" + index + " name=rate" + index + " value=\"1\" />\n" +
             "                <label title=\"rate\" for=star1-order" + index +  ">1 star</label>\n" +
             "  </div><br><br>\n" +
-            "    <p class=\" w3-large w3-serif\">\n" +
-            "    <i class=\"fa fa-quote-right w3-xxlarge w3-text-red\"></i><br> " + feedback.textRating + " </p>\n" +
-            "    <p> " + feedback.userGiverFeedback + " </p>\n" +
+            "    <p class=\" w3-large w3-serif w3-center\">\n" +
+            "    <i class=\"fa fa-quote-right w3-xxlarge w3-text-blue \"></i><br><i> " + feedback.textRating + " </i></p>\n" +
+            "    <p><b> " + feedback.userGiverFeedback + " </b></p>\n" +
             "  </div>\n"
         ).appendTo(feedbackInfo);
         $('input[name=rate'+ index +'][value=' + feedback.numericalRating + ']').prop('checked',true)
@@ -503,21 +495,21 @@ function initMakeOrderForm(){
 function changeToScTwoInMakeOrder(){
     $("#make-order").empty();
     $(
-        "<div id=\"sub-cart\" class=\"w3-third w3-container w3-card\" style=\"visibility: hidden; display: none\">\n" +
+        "<div id=\"sub-cart\" class=\"w3-third w3-panel  w3-card\" style=\"visibility: hidden; display: none\">\n" +
         "            <h4 style=\"padding-left: 17px\">Shopping Cart</h4>\n" +
-        "            <table id=\"sub-cart-table\" class=\"w3-table w3-striped w3-center\">\n" +
-        "                <tr class=\"\">\n" +
+        "            <table id=\"sub-cart-table\" class=\"w3-table w3-striped w3-centered\">\n" +
+        "            <thead>    <tr class=\"w3-light-grey\">\n" +
         "                    <th>Serial No.</th>\n" +
         "                    <th>Name</th>\n" +
         "                    <th>Amount</th>\n" +
-        "                </tr>\n" +
+        "                </tr></thead>" +
         "            </table><br>\n" +
-        "            <p id='move-next-screen' class=\"w3-cell-bottomright\">\n" +
+        "            <p id='move-next-screen' class=\"w3-right\">\n" +
         "                <button onclick='getSales()' style=\"border:none ;background:transparent\"> <i class=\"material-icons w3-xxlarge \">arrow_forward</i></button>\n" +
         "            </p>\n" +
-        "        </div>\n" +
-        "        <div id=\"order-items\" class=\"w3-rest w3-container w3-margin\">"+
-        " </div>"
+        "</div>\n" +
+        "<div id=\"order-items\" class=\"w3-rest w3-panel \">"+
+        "</div>"
     ).appendTo($("#make-order"));
 };
 
@@ -567,7 +559,7 @@ function showSummaryOrder(order) {
         "<span>Total Order Price: " + order.totalOrderPrice.toFixed(2) + " ₪</span>" +
         "<span style=\"visibility: hidden\">enter</span>\n" +
         "</p>" +
-        "<p class=\"w3-cell-bottommiddle\">\n" +
+        "<p class=\"w3-right\">\n" +
         "                <button class='executeOrderButton' type=\"submit\" style=\"border:none ;background:transparent\">\n" +
         "                    <i class=\"material-icons w3-xxlarge \">arrow_forward</i>\n" +
         "                </button>\n" +
@@ -580,7 +572,7 @@ function showSummaryOrder(order) {
 
     $.each(order.shoppingCarts || [], function (index, shoppingCart) {
         $(
-            "<div class=\"w3-card-4\" style=\"width: 71%\">\n" +
+            "<div class=\"w3-card-4 w3-rest\" >\n" +
             "            <header class=\"w3-container w3-pale-red w3-text-black\">\n" +
             "                <h5><b>Store Name: " + shoppingCart.storeName + "</b></h5>\n" +
             "                <span>Store ID: " + shoppingCart.storeID + " &nbsp;&nbsp; | &nbsp;&nbsp;</span>" +
@@ -734,6 +726,7 @@ function showSales(sales) {
 function appendSaleDetailsToList(id, saleDetailsInListString){
     var idList = $("#"+id);
     $.each(saleDetailsInListString || [], function (index, details) {
+        details = details.replace("?", "₪");
         $(
             "<li>" + details + "</li><br>"
         ).appendTo(idList);
@@ -752,6 +745,7 @@ function addSaleClicked(sale, formSaleOptionId){
          ).appendTo(formSaleOptionId);
 
          $.each(sale.saleDetailsInListString || [], function (index, details) {
+             details = details.replace("?", "₪");
              $(
                 "<input type=\"radio\" name=\"sale-option-serialnumber-item\" value=" + details.split(".")[1].split(" ")[1] + " required>" +
                 "<label>" + details + "</label><br>"
@@ -769,14 +763,17 @@ function addSaleClicked(sale, formSaleOptionId){
          });
 
          formSaleOptionId.toggleClass("w3-hide").toggleClass("w3-show");
-     }else{
+     }
+     else {
          addSaleToCart(sale);
      }
 };
 
 function addSaleToCart (sale, formSaleOptionId){
-    var serialNumberOfItemSelectedFromOneOfSaleType = (formSaleOptionId). find("input[name=sale-option-serialnumber-item]:checked").val();
-    if(serialNumberOfItemSelectedFromOneOfSaleType != null) {
+    if(formSaleOptionId != null) {
+        var serialNumberOfItemSelectedFromOneOfSaleType = (formSaleOptionId).find("input[name=sale-option-serialnumber-item]:checked").val();
+    }
+    if((formSaleOptionId == null) || (serialNumberOfItemSelectedFromOneOfSaleType != null)) {
         var SaleDTOandItemSR = {sale: sale, serialNumberItem: serialNumberOfItemSelectedFromOneOfSaleType};
 
         $.ajax({
@@ -838,11 +835,11 @@ function showAvailableItemsForOrder(items, orderType){
     $.each(items || [], function (index, item) {
         $(
             "        <form class=\"w3-row add-item-to-cart-form\" method=\"get\">" +
-            "<div class=\"w3-card-4\" style=\"width: 70%; height: 90px\">" +
+            "<div class=\"w3-card-4\" style=\"width: 700px; height: 110px\">" +
             "    <div class=\"w3-col w3-left w3-margin-right w3-margin-left\" style=\"width:15%\">\n" +
             "        <img src=\"../../imageAndIcon/barcode.png\" style=\"max-height: 80px\" alt=\"barcode\">\n" +
             "    </div>" +
-            "    <div class=\"w3-col w3-rest \" style=\"width:30%\">" +
+            "    <div class=\"w3-col w3-rest \" style=\"width:40%\">" +
             "        <span value=\""+item.itemName+"\" class=\"w3-opacity itemName\">" + item.itemName + "</span><br>" +
             "        <span value=\""+item.serialNumber+"\" class=\"w3-opacity serialNumber\">Serial No. " + item.serialNumber + "</span><br>" +
             "        <span class=\"w3-opacity serialNumber\">Purchase Category: " + item.purchaseCategory + "</span><br>" +
@@ -852,7 +849,7 @@ function showAvailableItemsForOrder(items, orderType){
             "            <label>Qty:</label>" +
             "            <input type=\"number\" name=\"amount\" step=\"0.100\" min=\"0.1\" max=\"50\" style=\"width:60px\" required>\n" +
             "            <button type=\"submit\" class=\"w3-button w3-circle w3-black w3-margin\">+</button><br>" +
-            "            <span id=error-add-item-s"+item.serialNumber+ " class=\"w3-text-red \" style=\"font-size: 13px\"></span>" +
+            "            <span id=error-add-item-s"+item.serialNumber+ " style=\"font-size: 13px\"></span>" +
             "    </div>" +
             "</div>" +
             "        </form>" +
@@ -881,10 +878,10 @@ function initAddItemToCartForm(){
                 url: ADD_ITEM_TO_CART,
                 timeout: 2000,
                 error: function (res) {
-                    $("#error-add-item-s"+chosenserialnumber).text(res.responseText);
+                    $("#error-add-item-s"+chosenserialnumber).text(res.responseText).removeClass("w3-text-green").addClass("w3-text-red");
                 },
                 success: function () {
-                    $("#error-add-item-s"+chosenserialnumber).text("");
+                    $("#error-add-item-s"+chosenserialnumber).text("item added successfully").removeClass("w3-text-red").addClass("w3-text-green");
                     addItemToSubCart("sub-cart", "sub-cart-table", chosenitemName, chosenserialnumber, Amount);
                     if (itemsInCartBeforeAddSales.get(chosenserialnumber) != null){
                         Amount = parseFloat(itemsInCartBeforeAddSales.get(chosenserialnumber)) + parseFloat(Amount);
@@ -1100,7 +1097,7 @@ function setMakeOrderTab(){
     chosenStoreInStaticOrder = "";
     $("#make-order").empty();
          $(
-             "<form class=\"w3-container w3-card-4 w3-light-grey\"  method=\"get\" action=\"makeOrderScOne\" id=\"orderform\">\n" +
+             "<form class=\"w3-panel w3-card-4 w3-light-grey\"  method=\"get\" action=\"makeOrderScOne\" id=\"orderform\">\n" +
              "\n" +
              "            <p>\n" +
              "                <label>Pick a date</label>\n" +
@@ -1128,7 +1125,7 @@ function setMakeOrderTab(){
              "            <p>\n" +
              "                <label id=\"error-screen-one-order-label\" class=\"w3-red\"></label>\n" +
              "            </p>\n" +
-             "            <p class=\"w3-cell-bottommiddle\">\n" +
+             "            <p class=\"w3-right\">\n" +
              "                <button  type=\"submit\" style=\"border:none ;background:transparent\"> <i class=\"material-icons w3-xxlarge \">arrow_forward</i></button>\n" +
              "            </p>\n" +
              "        </form>"
@@ -1183,7 +1180,7 @@ function appendOrdersToCustomerDetailsTable(orders){
     orderDetailsTable.empty();*/
 
     $(
-        "<table id=\"customer-details-table\" class=\"w3-margin w3-table w3-bordered w3-striped w3-centered\" style=\"max-width: 70%\"> <!---->" +
+        "<table id=\"customer-details-table\" class=\"w3-margin w3-table w3-bordered w3-striped w3-centered\" style=\"max-width: 72%\"> <!---->" +
         "<tr class=\"w3-dark-grey\">\n" +
         "<th>No. Order</th>" +
         "<th style='min-width: 120px'>Date</th>" +
@@ -1192,7 +1189,7 @@ function appendOrdersToCustomerDetailsTable(orders){
         "<th>No. Items Purchased</th>" +
         "<th>Items Purchased Cost</th>" +
         "<th>Delivery Cost</th>" +
-        "<th>Order Cost</th>" +
+        "<th style='min-width: 80px'>Order Cost</th>" +
         "</tr>" +
         "</table>"
     ).appendTo($("#customer-order-details-table"));
@@ -1200,7 +1197,7 @@ function appendOrdersToCustomerDetailsTable(orders){
     var detailsTable = $("#customer-details-table");
     $.each(orders || [], function (index, order) {
         $(
-            "<tr >" +
+            "<tr class=\"w3-hover-blue\">" +
             "<td>" + order.orderID + "</td>" +
             "<td>" + order.orderDate + "</td>" +
             "<td> (" + order.destinationXCoordinate + "," + order.destinationYCoordinate + ")</td>" +

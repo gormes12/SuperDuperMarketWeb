@@ -90,55 +90,30 @@
         </div>
     </div>
     <div id="deposited" class="w3-container w3-content w3-center action-transaction" style="display:none">
+        <div style="display: flex; justify-content: center" class="w3-padding">
         <form class="w3-container w3-padding w3-margin w3-card-4 w3-light-grey" method="get" action="deposit" id="depositform" style='max-width: 400px'>
             <p class="w3-center">
             <h3>When and how much to deposit</h3>
-
-            <p>
+            </p>
+            <div class="w3-left w3-row-padding w3-section">
                 <label>When to deposit?</label>
-                <input style="max-width: 200px" class="w3-input w3-border w3-round" type="date" id="date-to-deposit" name="date-to-deposit" min="2020-01-01" required>
-            <p>
-                <label>How much to deposit?</label>
-            <div class="w3-input w3-border w3-round" style="display: block; background-color: white; max-width: 200px">
-                <input style="border: none; max-width: 130px" id="amount-to-deposit" name="amount-to-deposit" type="number" step="any" min="1" max="5000" required>
-                <img class="w3-right" src="../../imageAndIcon/nis.png" style="height: 15px" alt="transaction">
+                <input style="width: 200px" class="w3-input w3-border w3-round" type="date" id="date-to-deposit" name="date-to-deposit" min="2020-01-01" required>
             </div>
-            <p>
+            <div class="w3-left w3-row-padding w3-section">
+                <label>How much to deposit?</label>
+                <div class="w3-input w3-border w3-round" style="display: block; background-color: white; width: 200px">
+                    <input style="border: none; max-width: 130px" id="amount-to-deposit" name="amount-to-deposit" type="number" step="any" min="1" max="5000" required>
+                    <img class="w3-right" src="../../imageAndIcon/nis.png" style="height: 15px; margin-top: 5px" alt="transaction">
+                </div>
+            </div>
+            <div class="w3-center w3-row-padding w3-section">
                 <label id="msg-deposit-label"></label><br>
                 <input type="submit" value="Deposit">
-            </p>
+            </div>
         </form>
+        </div>
         <br><br><br><br><br><br><br><br>
     </div>
-    <!--<div class="w3-row-padding">-->
-    <!--<div class="w3-quarter">
-        <div class="w3-card w3-container w3-border-black w3-round-xlarge">
-            <p align="center">Connected Users</p>
-            <ul id="user-list" class="w3-ul w3-margin-bottom">
-                &lt;!&ndash;container for user list&ndash;&gt;
-            </ul>
-        </div><br><br>
-        <div class="w3-row-padding">
-            <form action="uploadfile" method="post" id="uploadform">
-                <div id="upload-file">
-                    &lt;!&ndash;container upload file button&ndash;&gt;
-                </div>
-            </form>
-        </div>
-    </div>-->
-    <!--<div class="w3-rest">
-
-        <div class="w3-row-padding">
-
-            <div id="zone-info">
-
-            </div>
-        </div>
-        <div class="w3-row-padding">
-
-        </div>
-    </div>-->
-    <!--</div>-->
 </div>
 </body>
 </html>
