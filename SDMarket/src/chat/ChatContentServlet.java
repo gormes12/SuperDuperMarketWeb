@@ -1,8 +1,8 @@
-package order;
+package chat;
 
 import com.google.gson.Gson;
-import dto.ShoppingCartDTO;
-import my.project.manager.ZoneManager;
+import my.project.manager.ChatManager;
+import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -15,52 +15,60 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet(name = "HistoryOrdersServlet", urlPatterns = {"/historyOrders"})
-public class HistoryOrdersServlet extends HttpServlet {
+@WebServlet(name = "ChatContentServlet", urlPatterns = {"/chat"})
+public class ChatContentServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("application/json");
-
+        ChatManager chatManager = ServletUtils.getChatManager(getServletContext());
         String username = SessionUtils.getUsername(request);
         if (username == null) {
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
 
-        String zoneName = SessionUtils.getChosenZoneName(request);
-        if (zoneName == null) {
-            response.sendRedirect(request.getContextPath() + "/pages/main/information.html");
+        /*
+        verify chat version given from the user is a valid number. if not it is considered an error and nothing is returned back
+        Obviously the UI should be ready for such a case and handle it properly
+         */
+        int chatVersion = ServletUtils.getIntParameter(request, ConstantsUtils.CHAT_VERSION_PARAMETER);
+        if (chatVersion == ConstantsUtils.INT_PARAMETER_ERROR) {
+            return;
         }
-
-        ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
 
         /*
         Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
-        int storeID = Integer.parseInt(request.getParameter("stores"));
+        int chatManagerVersion = 0;
+        List<ChatMessage> chatEntries;
+        synchronized (getServletContext()) {
+            chatManagerVersion = chatManager.getVersion();
+            chatEntries = chatManager.getChatEntries(chatVersion);
+        }
+
+        // log and create the response json string
+        ChatAndVersion cav = new ChatAndVersion(chatEntries, chatManagerVersion);
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(cav);
 
         try (PrintWriter out = response.getWriter()) {
-            if (!zoneManager.getStoreOwnerName(storeID).equals(username)) {
-                response.setStatus(500);
-                out.print("You are not the owner of this store!" + System.lineSeparator() + "You have no access to see it orders.");
-                out.flush();
-                return;
-            }
-
-            List<ShoppingCartDTO> ordersEntries;
-            synchronized (getServletContext()) {
-                ordersEntries = zoneManager.getShoppingCartsOfStore(storeID);
-            }
-
-            // log and create the response json string
-            Gson gson = new Gson();
-            String jsonResponse = gson.toJson(ordersEntries);
-
             out.print(jsonResponse);
             out.flush();
         }
 
+    }
+
+
+    private static class ChatAndVersion {
+
+        final private List<ChatMessage> entries;
+        final private int version;
+
+        public ChatAndVersion(List<ChatMessage> entries, int version) {
+            this.entries = entries;
+            this.version = version;
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -1,0 +1,50 @@
+[type="file"] {
+    height: 0;
+    overflow: hidden;
+    width: 0;
+}
+
+[type="file"] + label {
+    background: #f15d22;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Rubik', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    outline: none;
+    padding: 1rem 30px;
+    position: relative;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    vertical-align: middle;
+}
+
+[type="file"] + label.btn-file {
+    background-color: #499eb7;
+    border-radius: 50px;
+    overflow: hidden;
+}
+[type="file"] + label.btn-file::before {
+    color: #fff;
+    place-content: center;
+    content: "\2601";
+    font-family: "Font Awesome 5 Pro";
+    font-size: 100%;
+    height: 100%;
+    right: 130%;
+    line-height: 3.3;
+    position: absolute;
+    top: 0px;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+[type="file"] + label.btn-file:hover {
+    background-color: #427f7f;
+}
+[type="file"] + label.btn-file:hover::before {
+    right: 75%;
+}

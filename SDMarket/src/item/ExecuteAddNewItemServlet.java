@@ -1,15 +1,8 @@
-package order;
+package item;
 
 import com.google.gson.Gson;
-import dto.SaleDTO;
-import my.project.location.Location;
 import my.project.manager.SystemManager;
 import my.project.manager.ZoneManager;
-import my.project.order.Order;
-import my.project.order.ShoppingCart;
-import my.project.user.Customer;
-import my.project.user.StoreOwner;
-import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -19,23 +12,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.List;
 
-@WebServlet(name = "ExecuteOrderServlet", urlPatterns = {"/executeOrder"})
-public class ExecuteOrderServlet extends HttpServlet {
+@WebServlet(name = "ExecuteAddNewItemServlet", urlPatterns = {"/executeAddNewItemToZone"})
+public class ExecuteAddNewItemServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("text/html;charset=UTF-8");
+//        response.setContentType("text/html;charset=UTF-8");
 
         String username = SessionUtils.getUsername(request);
         if (username == null) {
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
-
-        Customer customer = (Customer) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(username);
 
         String zoneName = SessionUtils.getChosenZoneName(request);
         if (zoneName == null) {
@@ -44,19 +33,22 @@ public class ExecuteOrderServlet extends HttpServlet {
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
 
-//        try (PrintWriter out = response.getWriter()) {
-        StoreOwner storeOwner;
-        Order orderInProcess = SessionUtils.getOrderInProcess(request);
-        zoneManager.executeOrderAndAddToSystem(orderInProcess);
-        customer.addOrder(zoneName, orderInProcess.createOrderDTO());
-        for (ShoppingCart shoppingCart : orderInProcess.getShoppingCarts().values()) {
-            storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(shoppingCart.getStoreDetails().getOwnerName());
-            storeOwner.getOrderManager().addOrder(shoppingCart.createShoppingCartDTO());
-            storeOwner.receivingPayment(orderInProcess.getOrderDate(), shoppingCart.getOrderCost());
+        String json = request.getParameter("data");
+
+        Gson gson = new Gson();
+        ItemData newItemData = gson.fromJson(json, ItemData.class);
+        int storeID;
+        double itemPrice;
+
+        int itemSerialNumber = zoneManager.addItemAndGetSerialNumber(newItemData.itemName, newItemData.purchaseCategory);
+        for (StoreIdAndPrice storeIdAndPrice : newItemData.selectedStoresIdAndPriceList) {
+            storeID = Integer.parseInt(storeIdAndPrice.id);
+            itemPrice = Double.parseDouble(storeIdAndPrice.price);
+            zoneManager.addItemToStore(storeID, itemSerialNumber, itemPrice);
         }
-        customer.withdrawalMoney(orderInProcess.getOrderDate(), orderInProcess.getOrderCost());
 
         SystemManager.isInnerInfoChangedInSomeZone = true;
+        return;
 
             /*Gson gson = new Gson();
             String jsonResponse;
@@ -71,6 +63,68 @@ public class ExecuteOrderServlet extends HttpServlet {
                 out.flush();
             }*/
 //        }
+    }
+
+    private class ItemData {
+
+        private String itemName;
+        private String purchaseCategory;
+        private List<StoreIdAndPrice> selectedStoresIdAndPriceList;
+
+
+        public ItemData() {
+
+        }
+
+        public List<StoreIdAndPrice> getSelectedStoresIdAndPriceList() {
+            return selectedStoresIdAndPriceList;
+        }
+
+        public void setSelectedStoresIdAndPriceList(List<StoreIdAndPrice> selectedStoresIdAndPriceList) {
+            this.selectedStoresIdAndPriceList = selectedStoresIdAndPriceList;
+        }
+
+        public String getItemName() {
+            return itemName;
+        }
+
+        public void setItemName(String itemName) {
+            this.itemName = itemName;
+        }
+
+        public String getPurchaseCategory() {
+            return purchaseCategory;
+        }
+
+        public void setPurchaseCategory(String purchaseCategory) {
+            this.purchaseCategory = purchaseCategory;
+        }
+    }
+
+    private class StoreIdAndPrice {
+
+        private String id;
+        private String price;
+
+        public StoreIdAndPrice() {
+
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getPrice() {
+            return price;
+        }
+
+        public void setPrice(String price) {
+            this.price = price;
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

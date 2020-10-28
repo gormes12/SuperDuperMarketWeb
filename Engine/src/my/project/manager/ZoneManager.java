@@ -23,6 +23,7 @@ public class ZoneManager {
     public static final int LocationXMinCoordinate = 1;
     public static final int LocationYMinCoordinate = 1;
     public static int STORE_ID = 100;
+    public static int ITEM_SERIALNUMBER = 100;
 
     private String ownerZoneName;
     private final String zoneName;
@@ -197,8 +198,10 @@ public class ZoneManager {
         }
     }
 
-    public void addItem(int serialNumber, String itemName, ePurchaseCategory purchaseCategory) {
-        addItem(new Item(serialNumber, itemName, purchaseCategory));
+    public int addItemAndGetSerialNumber(String itemName, String purchaseCategory) {
+        addItem(new Item(ITEM_SERIALNUMBER, itemName, purchaseCategory.equals("Quantity")? ePurchaseCategory.Quantity : ePurchaseCategory.Weight));
+        ITEM_SERIALNUMBER++;
+        return ITEM_SERIALNUMBER - 1;
     }
 
     public List<StoreDTO> getStores() {

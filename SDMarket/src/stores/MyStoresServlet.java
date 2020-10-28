@@ -1,15 +1,9 @@
-package order;
+package stores;
 
 import com.google.gson.Gson;
-import dto.SaleDTO;
-import my.project.location.Location;
-import my.project.manager.SystemManager;
+import dto.ShoppingCartDTO;
+import dto.StoreDTO;
 import my.project.manager.ZoneManager;
-import my.project.order.Order;
-import my.project.order.ShoppingCart;
-import my.project.user.Customer;
-import my.project.user.StoreOwner;
-import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
 
@@ -20,22 +14,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
-@WebServlet(name = "ExecuteOrderServlet", urlPatterns = {"/executeOrder"})
-public class ExecuteOrderServlet extends HttpServlet {
+@WebServlet(name = "MyStoresServlet", urlPatterns = {"/getStoresToAddNewItemToZone"})
+public class MyStoresServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("application/json");
 
         String username = SessionUtils.getUsername(request);
         if (username == null) {
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
-
-        Customer customer = (Customer) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(username);
 
         String zoneName = SessionUtils.getChosenZoneName(request);
         if (zoneName == null) {
@@ -44,33 +36,36 @@ public class ExecuteOrderServlet extends HttpServlet {
 
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
 
-//        try (PrintWriter out = response.getWriter()) {
-        StoreOwner storeOwner;
-        Order orderInProcess = SessionUtils.getOrderInProcess(request);
-        zoneManager.executeOrderAndAddToSystem(orderInProcess);
-        customer.addOrder(zoneName, orderInProcess.createOrderDTO());
-        for (ShoppingCart shoppingCart : orderInProcess.getShoppingCarts().values()) {
-            storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(shoppingCart.getStoreDetails().getOwnerName());
-            storeOwner.getOrderManager().addOrder(shoppingCart.createShoppingCartDTO());
-            storeOwner.receivingPayment(orderInProcess.getOrderDate(), shoppingCart.getOrderCost());
-        }
-        customer.withdrawalMoney(orderInProcess.getOrderDate(), orderInProcess.getOrderCost());
+        /*
+        Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
+        Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
+         */
 
-        SystemManager.isInnerInfoChangedInSomeZone = true;
-
-            /*Gson gson = new Gson();
-            String jsonResponse;
-
-            jsonResponse = gson.toJson(orderInProcess.createOrderDTO());
-            out.print(jsonResponse);
-            out.flush();*/
-
-            /*} catch (Exception e) {
+        try (PrintWriter out = response.getWriter()) {
+            if (!zoneManager.getOwnerZoneName().equals(username)) {
                 response.setStatus(500);
-                out.print(e.getMessage());
-                out.flush();
-            }*/
-//        }
+                return;
+            }
+
+            List<StoreDTO> storesInZone;
+            synchronized (getServletContext()) {
+                storesInZone = zoneManager.getStores();
+            }
+
+            List<StoreDTO> storesEntries = new ArrayList<>();
+            for (StoreDTO store : storesInZone){
+                if (store.getOwnerName().equals(username)){
+                    storesEntries.add(store);
+                }
+            }
+
+            // create the response json string
+            Gson gson = new Gson();
+            String jsonResponse = gson.toJson(storesEntries);
+
+            out.print(jsonResponse);
+            out.flush();
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -21,4 +21,7 @@ public class ConstantsUtils {
     public static final String CURRENT_LOCATION = "currentLocation";
     public static final String CURRENT_ITEMS_CART = "itemsCart";
     public static final String CURRENT_SELECTED_SALES_CART = "salesCart";
+
+    public static final String CHAT_PARAMETER = "userstring";
+    public static final String CHAT_VERSION_PARAMETER = "chatversion";
 }

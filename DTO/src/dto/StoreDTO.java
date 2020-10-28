@@ -165,6 +165,10 @@ public class StoreDTO {
     public List<SaleDTO> getSales() {
         return sales;
     }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
 //
 //    private String itemsToString() {
 //        String allItemsToString;

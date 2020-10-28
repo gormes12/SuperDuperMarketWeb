@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="SDMarket:Web">
+    <output-path>$PROJECT_DIR$/out/artifacts/SDMarket_Web</output-path>
+    <root id="archive" name="SDMarket_Web.war">
+      <element id="artifact" artifact-name="SDMarket:Web exploded" />
+    </root>
+  </artifact>
+</component>

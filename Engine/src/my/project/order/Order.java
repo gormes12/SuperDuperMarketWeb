@@ -107,4 +107,8 @@ public class Order {
 
         return sum;
     }
+
+    public double getOrderCost() {
+        return getTotalItemsPrice()+deliveryCost;
+    }
 }

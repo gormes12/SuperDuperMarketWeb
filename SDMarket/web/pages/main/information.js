@@ -1,6 +1,9 @@
 var zonesVersion = 0;
+var chatVersion = 0;
 var refreshRate = 2000; //milli seconds
 var USER_LIST_URL = buildUrlWithContextPath("userslist");
+var CHAT_SEND_URL = buildUrlWithContextPath("sendChat");
+var CHAT_LIST_URL = buildUrlWithContextPath("chat");
 var USER_TYPE_URL = buildUrlWithContextPath("usertype");
 var UPLOAD_FILE_URL = buildUrlWithContextPath("uploadfile");
 var ZONE_LIST_URL = buildUrlWithContextPath("zones");
@@ -8,11 +11,13 @@ var PASS_SCREEN = buildUrlWithContextPath("passScreen");
 
 $(function() {
     ajaxUsersList();
-    triggerAjaxZonesContent();
-
+    ajaxZonesContent();
+    ajaxChatContent();
+    initChatForm();
     //The users list is refreshed automatically every second
     setInterval(ajaxUsersList, refreshRate);
     initChooseZone();
+
 });
 
 function triggerAjaxZonesContent() {
@@ -157,10 +162,10 @@ $(function () {
             timeout: 4000,
             error: function(res) {
                 // console.error("Failed to submit");
-                $("#message-upload-file-label").text("File Error:\n" + res.responseText).addClass("w3-red").toggleClass("w3-green");
+                $("#message-upload-file-label").text("File Error:\n" + res.responseText).removeClass("w3-text-green").addClass("w3-text-red");
             },
             success: function(res) {
-                $("#message-upload-file-label").text("File Successfully Uploaded").toggleClass("w3-red").addClass("w3-green").toggleClass("w3-red");
+                $("#message-upload-file-label").text("File Successfully Uploaded").removeClass("w3-text-red").addClass("w3-text-green");
             }
         });
 
@@ -175,9 +180,111 @@ function addUploadFileButton() {
         url: USER_TYPE_URL,
         success: function(userType) {
             if (userType === "StoreOwner"){
-                $("<input type='file' name='file1'>" +
-                    "<input type='submit' value='Add Zone'/><br><br>").appendTo($("#upload-file"));
+                $("<input type='file' id='file1'>" +
+                    "<label for=\"file1\" class=\"btn-file\">upload</label> " +
+                    "<input class='w3-round-xlarge' type='submit' value='Add Zone'/><br>" +
+                    "<span class=\"file-name\">\n" +
+                    "      No file Selected\n" +
+                    "</span>").appendTo($("#upload-file"));
+
+                $('#file1').change(function() {
+                    var i = $(this).nextAll('span').clone();
+                    var file;
+                    if ($('#file1')[0].files[0] == null){
+                       file = "No File Selected";
+                    } else{
+                       file = $('#file1')[0].files[0].name;
+                    }
+                    $(this).nextAll('span').text(file);
+                    $("#message-upload-file-label").text("");
+                });
+
             }
         }
     });
 }
+
+function initChatForm(){
+    $("#chatform").submit(function() {
+        $.ajax({
+            data: $(this).serialize(),
+            url: CHAT_SEND_URL,
+            timeout: 2000,
+            error: function() {
+                console.error("Failed to submit");
+            },
+            success: function(r) {
+                //do not add the user string to the chat area
+                //since it's going to be retrieved from the server
+                //$("#result h1").text(r);
+            }
+        });
+
+        $("#userstring").val("");
+        // by default - we'll always return false so it doesn't redirect the user.
+        return false;
+    });
+};
+
+function appendToChatArea(messages) {
+//    $("#chatarea").children(".success").removeClass("success");
+
+    // add the relevant entries
+    $.each(messages || [], appendChatEntry);
+
+    // handle the scroller to auto scroll to the end of the chat area
+    var scroller = $("#chatarea");
+    var height = scroller[0].scrollHeight - $(scroller).height();
+    $(scroller).stop().animate({ scrollTop: height }, "slow");
+}
+
+function appendChatEntry(index, message){
+    var entryElement = createChatEntry(message);
+    $("#chatarea").append(entryElement).append("<br>");
+}
+
+function createChatEntry (message){
+    message.chatString = message.chatString.replace(":)", "<img style='width: 20px; height: 20px' src='../../imageAndIcon/happy-smile.png'/>")
+        .replace(":(", "<img style='width: 20px; height: 20px' src='../../imageAndIcon/sad-smile.png'/>");
+    return $("<span class=\"success\">").append(message.username + ": " + message.chatString);
+}
+
+function ajaxChatContent() {
+    $.ajax({
+        url: CHAT_LIST_URL,
+        data: "chatversion=" + chatVersion,
+        dataType: 'json',
+        success: function(data) {
+            /*
+             data will arrive in the next form:
+             {
+                "entries": [
+                    {
+                        "chatString":"Hi",
+                        "username":"bbb",
+                        "time":1485548397514
+                    },
+                    {
+                        "chatString":"Hello",
+                        "username":"bbb",
+                        "time":1485548397514
+                    }
+                ],
+                "version":1
+             }
+             */
+            if (data.version !== chatVersion) {
+                chatVersion = data.version;
+                appendToChatArea(data.entries);
+            }
+            triggerAjaxChatContent();
+        },
+        error: function(error) {
+            triggerAjaxChatContent();
+        }
+    });
+};
+
+function triggerAjaxChatContent() {
+    setTimeout(ajaxChatContent, refreshRate);
+};
