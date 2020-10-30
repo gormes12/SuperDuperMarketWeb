@@ -10,6 +10,7 @@ import my.project.user.User;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -53,7 +54,7 @@ public class getFeedbackAlertServlet extends HttpServlet {
          */
         int feedbackAlertStoreOwnerVersion = 0;
         List<Feedback> feedbacksEntries;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.feedbackManagerLock) {
             feedbackAlertStoreOwnerVersion = storeOwnerFeedbacksManager.getVersion();
             feedbacksEntries = storeOwnerFeedbacksManager.getFeedbacksEntries(feedbackAlertVersion);
         }

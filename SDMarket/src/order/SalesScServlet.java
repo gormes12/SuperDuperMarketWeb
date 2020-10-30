@@ -9,6 +9,7 @@ import my.project.user.Customer;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,6 +21,8 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
+
+
 
 @WebServlet(name = "SalesScServlet", urlPatterns = {"/sales"})
 public class SalesScServlet extends HttpServlet {
@@ -60,13 +63,13 @@ public class SalesScServlet extends HttpServlet {
                 if (request.getSession(false).getAttribute(ConstantsUtils.CURRENT_TYPE_ORDER).equals("static")) {
                     int storeID = (Integer) request.getSession(false).getAttribute(ConstantsUtils.CHOSEN_STORE_FOR_STATIC_ORDER);
 
-                    synchronized (getServletContext()) {
+                    synchronized (ThreadSafeUtils.orderManagerLock) {
                         order = zoneManager.createOrderFromItemList(date, storeID, customer, shoppingCart);
                         salesEntries = zoneManager.getSalesOfActiveOrder();
                     }
                     // create the response json string
                 } else {
-                    synchronized (getServletContext()) {
+                    synchronized (ThreadSafeUtils.orderManagerLock) {
                         order = zoneManager.createMinOrderFromItemList(date, customer, shoppingCart);
                         salesEntries = zoneManager.getSalesOfActiveOrder();
                     }

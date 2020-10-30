@@ -1,7 +1,5 @@
-// var itemsVersion = 0;
 var refreshRate = 2000; //milli seconds
 var chosenStoreInStaticOrder="";
-// var currentItem = 1;
 var ITEMS_LIST_URL = buildUrlWithContextPath("itemslist");
 var STORES_LIST_URL = buildUrlWithContextPath("storeslist");
 var ORDER_DETAILS_URL = buildUrlWithContextPath("historyOrders");
@@ -26,8 +24,6 @@ $(function() {
     addRelevantTab();
     ajaxItemsContent();
     ajaxStoresContent();
-    // triggerAjaxItemsContent();
-    // setInterval(ajaxStoresContent, refreshRate);
     initShowOrderDetailsForm();
     initMakeOrderForm();
     ajaxCustomerHistoryOrders();
@@ -41,79 +37,6 @@ function triggerAjaxItemsContent() {
 function triggerAjaxStoresContent() {
     setTimeout(ajaxStoresContent, refreshRate);
 };
-
-/*function ajaxItemsContent() {
-    $.ajax({
-        url: ITEMS_LIST_URL,
-        data: "itemsversion=" + itemsVersion,
-        dataType: 'json',
-        success: function(data) {
-            /!*
-             data will arrive in the next form:
-             {
-                "entries": [
-                    {
-                        "avgOrderPrice": 0,
-                        "ownerName": "maorgo",
-                        "totalItemType": 10,
-                        "totalOrders": 0,
-                        "totalStores": 4,
-                        "zoneName": "Hasharon"
-                    },
-                    {
-                        "avgOrderPrice": 0,
-                        "ownerName": "maorgo",
-                        "totalItemType": 5,
-                        "totalOrders": 0,
-                        "totalStores": 2,
-                        "zoneName": "Galil Maarvi"
-                    }
-                ],
-                "version":1
-             }
-             *!/
-            console.log("Server Items version: " + data.version + ", Current items version: " + itemsVersion);
-            if (data.version !== itemsVersion) {
-                itemsVersion = data.version;
-                appendToItemsInfo(data.entries);
-                initItemsSlide();
-
-            }
-            triggerAjaxItemsContent();
-        },
-        error: function(error) {
-            triggerAjaxItemsContent();
-        }
-    });
-}
-
-//entries = the added chat strings represented as a single string
-function appendToItemsInfo(entries) {
-    var itemsInfo = $("#items-info");
-    var scroller = $(".scroll");
-    if (itemsVersion === entries.length){
-        itemsInfo.empty();
-        currentItem = 1;
-    }
-    // add the relevant entries
-    $.each(entries || [], function (index, entry) {
-        $(
-            "<div class=\"w3-card-4 w3-round-xlarge w3-center mySlides\" style=\"width:300px\">" +
-            "<header class=\"w3-container w3-light-grey\">" +
-            "<h3>" + entry.itemName + "</h3><br>" +
-            "</header>" +
-            "<div class=\"w3-container\">" +
-            "<p> SerialNumber: " + entry.serialNumber + "</p>" +
-            "<p> Purchase Category: " + entry.purchaseCategory + "</p>" +
-            "<p> No. Stores Sell: " + entry.howManyStoreSold + "</p>" +
-            "<p> Average Price: " + entry.averagePrice.toFixed(2) + "</p>" +
-            "<p> No. Amount Sold: " + entry.howManyTimeSold + "</p>" +
-            "</div>" +
-            "</div>").appendTo(itemsInfo);
-        $("<span class=\"w3-badge demo w3-border w3-transparent w3-hover-dark-grey\" onclick=\"currentDiv(" + currentItem + ")\"></span>").appendTo(scroller);
-        currentItem = currentItem + 1;
-    });
-}*/
 
     var slideIndex = 1;
 function initItemsSlide() {
@@ -279,7 +202,7 @@ function initShowOrderDetailsForm() {
                     appendOrdersToDetailsTable(shoppingCarts);
                 } else{
                     $(
-                        "<h3>No Order Made!</h3>"
+                        "<h3 style='height: 100vh'>No Order Made!</h3>"
                     ).appendTo(orderDetailsTable);
                 }
             }
@@ -291,11 +214,6 @@ function initShowOrderDetailsForm() {
 };
 
 function appendOrdersToDetailsTable(shoppingCarts){
-    /*var orderDetailsTable = $("#order-details-table");
-
-    orderDetailsTable.empty();
-    $("#items-order-details").empty();*/
-
     $(
         "<table id=\"details-table\" class=\"w3-margin w3-table w3-bordered w3-striped w3-centered\" style=\"max-width: 70%\">" +
             "<tr class=\"w3-dark-grey\">\n" +
@@ -496,7 +414,6 @@ function initMakeOrderForm(){
             });
         }
 
-            // by default - we'll always return false so it doesn't redirect the user.
             return false;
     });
 };
@@ -515,7 +432,7 @@ function changeToScTwoInMakeOrder(){
         "            </table><br>\n" +
         "            <p id='move-next-screen' class=\"w3-right\">\n" +
         "                <button onclick='getSales()' style=\"border:none ;background:transparent\">" +
-        "                    <img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" >\n" +
+        "                    <img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" style='cursor: pointer'>\n" +
         "                </button>\n" +
         "            </p>\n" +
         "</div>\n" +
@@ -536,7 +453,7 @@ function getSales(){
                 nextScreen.empty();
                 $(
                     "<button onclick='getSummaryOrder()' style=\"border:none ;background:transparent\">" +
-                        "<img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" >" +
+                        "<img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" style='cursor: pointer'>" +
                     "</button>"
                 ).appendTo(nextScreen);
             }
@@ -562,7 +479,7 @@ function getSummaryOrder(){
 function showSummaryOrder(order) {
     var cartContainer = $("#order-items");
     cartContainer.empty();
-    $("#sub-cart").empty();/*.width('28%')*/
+    $("#sub-cart").empty();
     $(
         "<h4 style=\"padding-left: 17px\">Summary Order</h4>"+
         "<p>" +
@@ -574,7 +491,7 @@ function showSummaryOrder(order) {
         "</p>" +
         "<p class=\"w3-right\">\n" +
         "                <button class='executeOrderButton' type=\"submit\" style=\"border:none ;background:transparent\">\n" +
-        "                    <img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" >" +
+        "                    <img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" style='cursor: pointer'>" +
         "                </button>\n" +
         "            </p>"
     ).appendTo($("#sub-cart"));
@@ -596,7 +513,7 @@ function showSummaryOrder(order) {
             "            </header>" +
             "            <div id='summaryOrderFromStore-"+ index +"' class=\"w3-container\">" +
             "            </div>" +
-            "            <span class=\"w3-button w3-block w3-dark-grey\">Thank You</span>\n" +
+            "            <span class=\"w3-button w3-block w3-dark-grey\" style='cursor: default'>Thank You</span>\n" +
             "</div><br>"
         ).appendTo(cartContainer);
         addOrdersItemsToContainer(shoppingCart.items, "summaryOrderFromStore-"+index);
@@ -690,7 +607,6 @@ function initAddFeedbackForms(){
             }
         });
 
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
 };
@@ -704,7 +620,6 @@ function showSales(sales) {
 
     $.each(sales || [], function (index, sale) {
         $(
-        // "<form class=\"w3-row add-item-to-cart-form\" method=\"get\">\n" +
         "    <div class=\"w3-card-4\" style=\"width:35%\">\n" +
         "        <header class=\"w3-container w3-light-grey\">\n" +
         "            <img src=\"../../imageAndIcon/sale.png\"  alt=\"sale\" class=\"w3-left  w3-margin-right\" style=\"width:60px\">\n" +
@@ -725,7 +640,6 @@ function showSales(sales) {
         "             </form>" +
         "       </div>" +
         "  </div>\n" +
-        // "</form>\n" +
         "<hr style=\"width:35%\">"
         ).appendTo(saleCard);
         $( ".addSaleButton:last" ).click(function() {
@@ -903,11 +817,8 @@ function initAddItemToCartForm(){
                 }
             });
 
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
-
-
 };
 
 function addItemToSubCart(subCartID, subCartTableID, chosenitemName, chosenserialnumber, Amount){
@@ -962,12 +873,12 @@ function initAddNewItemTab() {
             error: function (res) {
                 $("#add-new-item").empty();
                 $(
-                    "<div class=\"w3-card-4 w3-round-xlarge w3-padding\" style=\"width:40%\">\n" +
-                    "        <div class=\"w3-center\"><br>\n" +
+                    "<div class=\"w3-card-4 w3-round-xlarge w3-padding\" style='height: 100vh'>\n" +
+                    "        <div class=\"w3-center\" ><br>\n" +
                     "          <img src=\"../../imageAndIcon/no-access.png\" alt=\"no-access\" style=\"width:10%\" class=\"w3-circle w3-margin-top\"><br>\n" +
                     "          <label><b>No Access</b></label>\n" +
                     "        </div>\n" +
-                    "        <div class=\"w3-section\">\n" +
+                    "        <div class=\"w3-section w3-center\">\n" +
                     "          <label>You are not the owner zone !</label><br>\n" +
                     "        </div>\n" +
                     "</div>"
@@ -983,7 +894,7 @@ function setAddNewItemTab(stores){
     $("#add-new-item").empty();
     $(
         "<form class=\"w3-container w3-panel w3-card w3-round-large w3-padding\" id='addNewItemForm'>\n" +
-        "  <div class=\"w3-container w3-light-blue\">\n" +
+        "  <div class=\"w3-container w3-purple\">\n" +
         "    <h4>Fill the following details</h4>\n" +
         "  </div>\n" +
         "  <p>\n" +
@@ -999,7 +910,7 @@ function setAddNewItemTab(stores){
         "  <p id='myStores'>\n" +
         "  </p>\n" +
         "  <p class='w3-center'>" +
-        "       <button id='addNewItem-btn' type=\"submit\" class=\"w3-button w3-white w3-border w3-round-large\" style=\"width:90px\" disabled>Add Item</button>\n" +
+        "       <button id='addNewItem-btn' type=\"submit\" class=\"w3-button w3-white w3-border w3-round-large w3-center\" style=\"width:90px\" disabled>Add Item</button>\n" +
         "  </p>\n" +
         "</form>"
     ).appendTo($("#add-new-item"));
@@ -1061,7 +972,6 @@ function initSelectedStoreForm() {
             "</div>"
         ).appendTo(responseContainer);
 
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
 };
@@ -1086,7 +996,7 @@ function initAddNewItemForm() {
             success: function () {
                 $("#add-new-item").empty();
                 $(
-                    "<div class=\"w3-card-4 w3-round-xlarge w3-padding\" style=\"width:40%\">\n" +
+                    "<div class=\"w3-card-4 w3-round-xlarge w3-padding w3-center\" style=\"height: 70vh\">\n" +
                     "<header> " +
                     "<h6>Item Added Successfully</h6>" +
                     "</header> " +
@@ -1095,7 +1005,6 @@ function initAddNewItemForm() {
             }
         });
 
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
 };
@@ -1104,7 +1013,7 @@ function setOpenNewStoreTab(){
     $("#open-new-store").empty();
     $(
         "<form class=\"w3-container w3-panel w3-card w3-round-large w3-padding\" id='openNewStoreForm'>\n" +
-        "<div class=\"w3-container w3-light-blue\">\n" +
+        "<div class=\"w3-container w3-purple\">\n" +
         "  <h4>Fill the following details</h4>\n" +
         "</div>\n" +
         "\n" +
@@ -1119,12 +1028,12 @@ function setOpenNewStoreTab(){
         "  </p>\n" +
         "  <p>\n" +
         "       <label><b>PPK</b></label><br>\n" +
-        "       <input class=\"w3-input\" id=\"ppk\" name=\"ppk\" type=\"number\" step=\"any\" required style=\"width:90px\" ></p><br>\n" +
+        "       <input class=\"w3-input\" id=\"ppk\" name=\"ppk\" type=\"number\" step=\"any\" min='0' required style=\"width:90px\" ></p><br>\n" +
         "  <p>" +
         "       <label id=\"error-screen-one-open-store-label\" class=\"w3-text-red\"></label>\n" +
         "  </p>" +
         "  <p class='w3-center'>" +
-        "       <button type=\"submit\" class=\"w3-button w3-white w3-border w3-round-large\" style=\"width:90px\">Next</button>\n" +
+        "       <button type=\"submit\" class=\"w3-button w3-white w3-border w3-round-large\" style=\"width:90px; cursor: pointer\">Next</button>\n" +
         "  </p>\n" +
         "</form>"
     ).appendTo($("#open-new-store"));
@@ -1149,7 +1058,6 @@ function initOpenNewStoreForm() {
             }
         });
 
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
 };
@@ -1169,7 +1077,7 @@ function chooseItemsToNewStore(items){
         "            </table><br>\n" +
         "            <p class=\"w3-right\">\n" +
         "                <button onclick='addNewStore()' style=\"border:none ;background:transparent\">" +
-        "                    <img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" >" +
+        "                    <img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" style='cursor: pointer'>" +
         "                </button>" +
         "            </p>\n" +
         " </div>\n" +
@@ -1229,7 +1137,6 @@ function initAddItemToStoreForm() {
             }
         });
 
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
 };
@@ -1239,16 +1146,16 @@ function addNewStore(){
         url: EXECUTE_ADD_NEW_STORE_URL,
         success: function() {
             console.log("New Store Added!");
-            $("#sub-summary").empty();
-            $("#newStore-items").empty();
+            // $("#sub-summary").empty();
+            // $("#newStore-items").empty();
+            $("#open-new-store").empty();
             $(
-                "<div class=\"w3-card-4 w3-round-xlarge w3-padding\" style=\"width:40%\">\n" +
-                "<header> " +
+                "<div class=\"w3-card-4 w3-round-xlarge w3-padding w3-animate-zoom\" style='height: 100vh'>\n" +
+                "<header class='w3-center'> " +
                 "<h6>Store Added Successfully</h6>" +
                 "</header> " +
-                // "<div><label> The feedback to store named " + storeName + ", id - " + storeID + " was sent successfully! </label></div>" +
                 "</div>"
-            ).appendTo($("#newStore-items"));
+            ).appendTo($("#open-new-store"));
         },
         error: function (error){
             console.log(error.responseText);
@@ -1290,7 +1197,7 @@ function setMakeOrderTab(){
              "            </p>\n" +
              "            <p class=\"w3-right\">\n" +
              "                <button  type=\"submit\" style=\"border:none ;background:transparent\">" +
-             "                    <img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" >" +
+             "                    <img src=\"../../imageAndIcon/forward-arrow.png\" alt=\"next\" style='cursor: pointer' >" +
              "                </button>\n" +
              "            </p>\n" +
              "        </form>"
@@ -1328,9 +1235,8 @@ function ajaxCustomerHistoryOrders() {
                 if (orders !== null) {
                     appendOrdersToCustomerDetailsTable(orders);
                 } else{
-                    // $("#customer-order-details-table").empty();
                     $(
-                        "<h3>No Order Made!</h3>"
+                        "<h3 style='height: 100vh'>No Order Made!</h3>"
                     ).appendTo(orderDetailsTable);
 
                 }
@@ -1340,10 +1246,6 @@ function ajaxCustomerHistoryOrders() {
 };
 
 function appendOrdersToCustomerDetailsTable(orders){
-    /*var orderDetailsTable = $("#customer-order-details-table");
-
-    orderDetailsTable.empty();*/
-
     $(
         "<table id=\"customer-details-table\" class=\"w3-margin w3-table w3-bordered w3-striped w3-centered\" style=\"max-width: 72%\"> <!---->" +
         "<tr class=\"w3-dark-grey\">\n" +

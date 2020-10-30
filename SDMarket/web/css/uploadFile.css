@@ -6,15 +6,16 @@
 
 [type="file"] + label {
     background: #f15d22;
-    border: none;
+    border: 1px solid black;
     border-radius: 5px;
-    color: #fff;
+    color: black;
     cursor: pointer;
     display: inline-block;
     font-family: 'Rubik', sans-serif;
     font-size: 15px;
     font-weight: 300;
-    margin-bottom: 1rem;
+    /*margin-bottom: 1rem;*/
+    /*margin-top: 10px;*/
     outline: none;
     padding: 1rem 30px;
     position: relative;
@@ -24,8 +25,9 @@
 }
 
 [type="file"] + label.btn-file {
-    background-color: #499eb7;
-    border-radius: 50px;
+    background-color: transparent;
+    border-radius: 60px;
+    border-color: black;
     overflow: hidden;
 }
 [type="file"] + label.btn-file::before {
@@ -38,7 +40,7 @@
     right: 130%;
     line-height: 3.3;
     position: absolute;
-    top: 0px;
+    top: 2px;
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
 }
@@ -46,5 +48,9 @@
     background-color: #427f7f;
 }
 [type="file"] + label.btn-file:hover::before {
-    right: 75%;
+    right: 85%;
+}
+
+.file-box svg {
+    display: block;
 }

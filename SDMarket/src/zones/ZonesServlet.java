@@ -7,6 +7,7 @@ import my.project.manager.ZonesManager;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -46,7 +47,7 @@ public class ZonesServlet extends HttpServlet {
          */
         int zonesManagerVersion = 0;
         List<ZoneDTO> zoneEntries;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.zonesManagerLock) {
             zonesManagerVersion = zonesManager.getVersion();
             if (SystemManager.isInnerInfoChangedInSomeZone){
                 zoneEntries = zonesManager.getZonesEntries(0);

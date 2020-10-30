@@ -13,19 +13,19 @@ public class BankAccount {
     private double cashMoney;
     private final List<BankTransaction> actionHistory = new LinkedList<>();
 
-    public void depositedMoney(LocalDate date, double amount){
+    public synchronized void depositedMoney(LocalDate date, double amount){
         actionHistory.add(new BankTransaction
                 (BankTransaction.eActionType.Deposited, date, amount, cashMoney, cashMoney+amount));
         cashMoney += amount;
     }
 
-    public void receivingPayment(LocalDate date, double amount){
+    public synchronized void receivingPayment(LocalDate date, double amount){
         actionHistory.add(new BankTransaction
                 (BankTransaction.eActionType.ReceivingPayment, date, amount, cashMoney, cashMoney+amount));
         cashMoney += amount;
     }
 
-    public double withdrawalMoney(LocalDate date, double amount){
+    public synchronized double withdrawalMoney(LocalDate date, double amount){
         actionHistory.add(new BankTransaction
                 (BankTransaction.eActionType.Withdrawal, date, amount, cashMoney, cashMoney-amount));
         cashMoney -= amount;

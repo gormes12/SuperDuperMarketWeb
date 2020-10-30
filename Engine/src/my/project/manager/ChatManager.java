@@ -12,11 +12,11 @@ public class ChatManager {
         chatDataList = new ArrayList<>();
     }
 
-    public synchronized void addChatMessage(String chatString, String username) {
+    public void addChatMessage(String chatString, String username) {
         chatDataList.add(new ChatMessage(chatString, username));
     }
 
-    public synchronized List<ChatMessage> getChatEntries(int fromIndex){
+    public List<ChatMessage> getChatEntries(int fromIndex){
         if (fromIndex < 0 || fromIndex > chatDataList.size()) {
             fromIndex = 0;
         }

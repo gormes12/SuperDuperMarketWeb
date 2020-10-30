@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">-->
     <link rel="stylesheet" href="../../css/commonStyle.css">
     <link rel="stylesheet" href="../../css/uploadFile.css">
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->
     <script src="../../common/jquery-2.0.3.min.js"></script>
     <script src="../../common/context-path-helper.js"></script>
     <script src="information.js"></script>
@@ -30,37 +27,21 @@
         }
     </script>
 
-    <!--<script>
-        const fileInput = document.querySelector('#upload-file input[type=file]');
-        fileInput.onchange = () => {
-            if (fileInput.files.length > 0) {
-                const fileName = document.querySelector('#upload-file .file-name');
-                fileName.textContent = fileInput.files[0].name;
-            }
-        }
-    </script>-->
 </head>
 <body>
 
 <!-- Side Navigation -->
-<!--
-<nav class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-center" style="display:none" id="mySidebar">
--->
+
     <div class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-center" style="display:none" id="mySidebar">
     <button class="w3-bar-item w3-button" onclick="w3_close()">Close &times;<!--<i class="fa fa-remove"></i>--></button>
-    <!--<h1 class="w3-large w3-text-theme">Menu</h1>-->
     <a href="" class="w3-bar-item w3-button">Info & Zones</a>
     <a href="BankAccount.html" class="w3-bar-item w3-button">Bank Account</a>
-    <a href="../../logout" class="w3-bar-item w3-button">Logout</a>
 
     </div>
-<!--
-</nav>
--->
+
 <!-- Header -->
 <header class="w3-container w3-theme w3-padding w3-dark-grey" id="myHeader">
     <button id="openNav" class="w3-button w3-xlarge" onclick="w3_open()">&#9776;</button>
-    <!--<i onclick="w3_open()" class="fa fa-bars w3-xlarge w3-button w3-theme"></i>-->
     <div class="w3-center">
         <h3 class="w3-xxxlarge w3-animate-bottom">Super Duper Market</h3>
         <p>The perfect place for your shopping!</p>
@@ -82,7 +63,7 @@
                 </div>
             </div><br><br>
 
-            <div class="w3-row-padding ">
+            <div class="w3-row-padding file-box" style="color: #427f7f">
                 <form action="uploadfile" method="post" id="uploadform">
                     <div id="upload-file">
                         <!--container upload file button-->
@@ -92,12 +73,12 @@
             </div>
 
             <div id="chatwindow" class="w3-modal" >
-                <div class="content w3-modal-content w3-card-4 w3-animate-zoom w3-padding w3-border-black w3-round-xlarge" style="width: 400px; height: 265px">
+                <div class="content w3-modal-content w3-card-4 w3-animate-zoom w3-padding w3-border-black w3-round-xlarge" style="width: 500px; height: 365px">
                     <div >
                         <span class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close"
                               onclick="document.getElementById('chatwindow').style.display='none'">&times;</span>
                         <h4 class="w3-center"><b>Chat</b></h4>
-                        <div id="chatarea" class="span6" style="height: 150px; overflow-y: scroll; max-height: 150px">
+                        <div id="chatarea" class="span6" style="height: 250px; overflow-y: scroll; max-height: 250px">
                             <!--container for chat messages-->
                         </div>
                         <div class="w3-padding-16">
@@ -106,8 +87,6 @@
                                 <button class="w3-button w3-padding-small w3-circle" type="submit">
                                     <img src="../../imageAndIcon/send-message.png" alt="send-message" style="height: 20px; margin-bottom: 3px">
                                 </button>
-                                <!--
-                                <input class="w3-button w3-round-xxlarge w3-medium" type="submit" value="Send"/>-->
                             </form>
                         </div>
                     </div>

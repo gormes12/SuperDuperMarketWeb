@@ -8,6 +8,7 @@ import my.project.manager.ZoneManager;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 import zones.ZonesServlet;
 
 import javax.servlet.ServletException;
@@ -43,7 +44,7 @@ public class ItemsServlet extends HttpServlet {
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
         List<ItemDTO> itemsEntries;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.itemManagerLock) {
             itemsEntries = zoneManager.getItems();
         }
 

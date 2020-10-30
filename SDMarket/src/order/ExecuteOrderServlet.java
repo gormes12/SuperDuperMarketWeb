@@ -12,6 +12,7 @@ import my.project.user.StoreOwner;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.HashMap;
+
+
 
 @WebServlet(name = "ExecuteOrderServlet", urlPatterns = {"/executeOrder"})
 public class ExecuteOrderServlet extends HttpServlet {
@@ -47,14 +50,16 @@ public class ExecuteOrderServlet extends HttpServlet {
 //        try (PrintWriter out = response.getWriter()) {
         StoreOwner storeOwner;
         Order orderInProcess = SessionUtils.getOrderInProcess(request);
-        zoneManager.executeOrderAndAddToSystem(orderInProcess);
-        customer.addOrder(zoneName, orderInProcess.createOrderDTO());
-        for (ShoppingCart shoppingCart : orderInProcess.getShoppingCarts().values()) {
-            storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(shoppingCart.getStoreDetails().getOwnerName());
-            storeOwner.getOrderManager().addOrder(shoppingCart.createShoppingCartDTO());
-            storeOwner.receivingPayment(orderInProcess.getOrderDate(), shoppingCart.getOrderCost());
+        synchronized (ThreadSafeUtils.orderManagerLock) {
+            zoneManager.executeOrderAndAddToSystem(orderInProcess);
+            customer.addOrder(zoneName, orderInProcess.createOrderDTO());
+            for (ShoppingCart shoppingCart : orderInProcess.getShoppingCarts().values()) {
+                storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(shoppingCart.getStoreDetails().getOwnerName());
+                storeOwner.getOrderManager().addOrder(shoppingCart.createShoppingCartDTO());
+                storeOwner.receivingPayment(orderInProcess.getOrderDate(), shoppingCart.getOrderCost());
+            }
+            customer.withdrawalMoney(orderInProcess.getOrderDate(), orderInProcess.getOrderCost());
         }
-        customer.withdrawalMoney(orderInProcess.getOrderDate(), orderInProcess.getOrderCost());
 
         SystemManager.isInnerInfoChangedInSomeZone = true;
 

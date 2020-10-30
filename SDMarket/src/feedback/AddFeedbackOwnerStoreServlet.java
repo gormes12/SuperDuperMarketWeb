@@ -5,6 +5,7 @@ import my.project.user.StoreOwner;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -41,7 +42,9 @@ public class AddFeedbackOwnerStoreServlet extends HttpServlet {
         LocalDate date = (LocalDate) request.getSession(false).getAttribute(ConstantsUtils.DATE_ORDER);
 
         StoreOwner storeOwner = (StoreOwner) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(zoneManager.getStoreOwnerName(storeID));
-        storeOwner.getFeedbacksManager().addFeedback(zoneName, username, date, rate, textRate);
+        synchronized (ThreadSafeUtils.feedbackManagerLock) {
+            storeOwner.getFeedbacksManager().addFeedback(zoneName, username, date, rate, textRate);
+        }
 
     }
 

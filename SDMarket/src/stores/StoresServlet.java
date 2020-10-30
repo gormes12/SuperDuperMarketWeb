@@ -6,6 +6,7 @@ import dto.StoreDTO;
 import my.project.manager.ZoneManager;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -41,7 +42,7 @@ public class StoresServlet extends HttpServlet {
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
         List<StoreDTO> storesEntries;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.storeManagerLock) {
             storesEntries = zoneManager.getStores();
         }
 

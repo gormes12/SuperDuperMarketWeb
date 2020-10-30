@@ -6,6 +6,7 @@ import my.project.user.User;
 import my.project.xml.XMLoader;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -14,7 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -48,7 +48,7 @@ public class UploadFileServlet extends HttpServlet {
                 PrintWriter out = response.getWriter();
 
             try {
-                synchronized (getServletContext()) {
+                synchronized (ThreadSafeUtils.zonesManagerLock) {
                     ZoneManager zoneManager = XMLoader.getZoneFrom(fileInputStream, user);
                     systemManager.addZone(zoneManager.getZoneName(), zoneManager);
                 }

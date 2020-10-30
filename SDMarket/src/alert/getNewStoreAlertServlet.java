@@ -9,6 +9,7 @@ import my.project.user.User;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -51,7 +52,7 @@ public class getNewStoreAlertServlet extends HttpServlet {
          */
         int newStoreAlertStoreOwnerVersion = 0;
         List<StoreDTO> newStoresEntries;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.storeManagerLock) {
             newStoreAlertStoreOwnerVersion = storeOwner.getCompetitiveStoresVersion();
             newStoresEntries = storeOwner.getCompetitiveStoreEntries(newStoreAlertVersion);
         }

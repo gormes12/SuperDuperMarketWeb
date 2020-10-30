@@ -7,6 +7,7 @@ import my.project.order.Order;
 import my.project.user.Customer;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -39,22 +40,10 @@ public class CustomerHistoryOrderServlet extends HttpServlet {
         ZoneManager zoneManager = ServletUtils.getSystemManager(getServletContext()).getZone(zoneName);
         Customer customer = (Customer) ServletUtils.getSystemManager(getServletContext()).getUserManager().getUser(username);
 
-        /*
-        Synchronizing as minimum as I can to fetch only the relevant information from the chat manager and then only processing and sending this information onward
-        Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
-         */
         Collection<OrderDTO> orders;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.orderManagerLock) {
             orders = customer.getOrdersFromZone(zoneName);
         }
-
-        /*List<OrderDTO> ordersEntries = new ArrayList<>();
-
-        if (orders != null) {
-            for (Order order : orders) {
-                ordersEntries.add(order.createOrderDTO());
-            }
-        }*/
 
         try (PrintWriter out = response.getWriter()) {
             // create the response json string

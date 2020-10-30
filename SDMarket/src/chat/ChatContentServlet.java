@@ -5,6 +5,7 @@ import my.project.manager.ChatManager;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -42,7 +43,7 @@ public class ChatContentServlet extends HttpServlet {
          */
         int chatManagerVersion = 0;
         List<ChatMessage> chatEntries;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.chatManagerLock) {
             chatManagerVersion = chatManager.getVersion();
             chatEntries = chatManager.getChatEntries(chatVersion);
         }

@@ -13,6 +13,7 @@ import my.project.user.User;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 import zones.ZonesServlet;
 
 import javax.servlet.ServletException;
@@ -57,7 +58,7 @@ public class getOrderAlertServlet extends HttpServlet {
          */
         int orderAlertStoreOwnerVersion = 0;
         List<ShoppingCartDTO> ordersEntries;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.orderManagerLock) {
             orderAlertStoreOwnerVersion = storeOwnerOrderManager.getVersion();
             ordersEntries = storeOwnerOrderManager.getOrdersEntries(orderAlertVersion);
         }

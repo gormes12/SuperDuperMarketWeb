@@ -8,6 +8,7 @@ import my.project.user.Customer;
 import my.project.user.StoreOwner;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -44,7 +45,7 @@ public class FeedbacksOwnerStoreServlet extends HttpServlet {
         Note that the synchronization here is on the ServletContext, and the one that also synchronized on it is the chat servlet when adding new chat lines.
          */
         Collection<Feedback> feedbacks;
-        synchronized (getServletContext()) {
+        synchronized (ThreadSafeUtils.feedbackManagerLock) {
             feedbacks = storeOwner.getFeedbacksManager().getFeedbackFromZone(zoneName);
         }
 

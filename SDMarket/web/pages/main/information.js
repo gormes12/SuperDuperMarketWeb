@@ -14,7 +14,6 @@ $(function() {
     ajaxZonesContent();
     ajaxChatContent();
     initChatForm();
-    //The users list is refreshed automatically every second
     setInterval(ajaxUsersList, refreshRate);
     initChooseZone();
 
@@ -83,9 +82,9 @@ function appendToZonesInfo(entries) {
                     "<p> Total Stores: " + entry.totalStores + "</p>" +
                     "<p> Total Orders: " + entry.totalOrders + "</p>" +
                     "<p> Average Order Price: " + entry.avgOrderPrice.toFixed(2) + "</p>" +
-                    "<form action='passScreen' method='post' class='pass-screen' style='padding-bottom: 8px'>" +
+                    "<form action='passScreen' method='post' class='pass-screen w3-center' style='padding-bottom: 8px'>" +
                         "<input name='chooseZone' value=\"" + entry.zoneName + "\" style='display: none'/>" +
-                        "<input type='submit' value='Enter'/>" +
+                        "<input class='w3-round-large w3-btn' style='border: 1px solid black ' type='submit' value='Enter'/>" +
                     "</form>" +
                 "</div>" +
         "</div>").appendTo(zonesInfo);
@@ -102,23 +101,15 @@ function initChooseZone(){
             url: PASS_SCREEN,
             timeout: 2000,
             error: function(res) {
-                // console.error("Failed to submit");
-                // $("#message-upload-file-label").text("File Error:\n" + res.responseText).addClass("w3-red").toggleClass("w3-green");
             },
             success: function(res) {
-                //$("#message-upload-file-label").text("File Successfully Uploaded").toggleClass("w3-red").addClass("w3-green").toggleClass("w3-red");
             }
         });
 
-        //$("#userstring").val("");
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
 }
 
-
-//users = a list of usernames, essentially an array of javascript strings:
-// ["moshe","nachum","nachche"...]
 function refreshUsersList(users) {
     var userList = $("#user-list");
 
@@ -151,7 +142,6 @@ $(function () {
 
         var formData = new FormData();
         formData.append("file", file);
-        // formData.append("name", this[1].value);
 
         $.ajax({
             method: 'POST',
@@ -161,7 +151,6 @@ $(function () {
             contentType: false,
             timeout: 4000,
             error: function(res) {
-                // console.error("Failed to submit");
                 $("#message-upload-file-label").text("File Error:\n" + res.responseText).removeClass("w3-text-green").addClass("w3-text-red");
             },
             success: function(res) {
@@ -169,8 +158,6 @@ $(function () {
             }
         });
 
-        //$("#userstring").val("");
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
 });
@@ -181,21 +168,21 @@ function addUploadFileButton() {
         success: function(userType) {
             if (userType === "StoreOwner"){
                 $("<input type='file' id='file1'>" +
-                    "<label for=\"file1\" class=\"btn-file\">upload</label> " +
-                    "<input class='w3-round-xlarge' type='submit' value='Add Zone'/><br>" +
+                    "<label for=\"file1\" class=\"btn-file\">upload zone</label> " +
+                    "<button class='w3-round-xxlarge w3-btn' style='box-shadow:0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)' type='submit' value='Add Zone'>Add</button><br>" +
                     "<span class=\"file-name\">\n" +
-                    "      No file Selected\n" +
+                    "" +
                     "</span>").appendTo($("#upload-file"));
 
                 $('#file1').change(function() {
-                    var i = $(this).nextAll('span').clone();
+                    var i = $('.file-name').clone();
                     var file;
                     if ($('#file1')[0].files[0] == null){
                        file = "No File Selected";
                     } else{
                        file = $('#file1')[0].files[0].name;
                     }
-                    $(this).nextAll('span').text(file);
+                    $('.file-name').text(file);
                     $("#message-upload-file-label").text("");
                 });
 
@@ -214,20 +201,16 @@ function initChatForm(){
                 console.error("Failed to submit");
             },
             success: function(r) {
-                //do not add the user string to the chat area
-                //since it's going to be retrieved from the server
-                //$("#result h1").text(r);
+
             }
         });
 
         $("#userstring").val("");
-        // by default - we'll always return false so it doesn't redirect the user.
         return false;
     });
 };
 
 function appendToChatArea(messages) {
-//    $("#chatarea").children(".success").removeClass("success");
 
     // add the relevant entries
     $.each(messages || [], appendChatEntry);
@@ -246,7 +229,10 @@ function appendChatEntry(index, message){
 function createChatEntry (message){
     message.chatString = message.chatString.replace(":)", "<img style='width: 20px; height: 20px' src='../../imageAndIcon/happy-smile.png'/>")
         .replace(":(", "<img style='width: 20px; height: 20px' src='../../imageAndIcon/sad-smile.png'/>");
-    return $("<span class=\"success\">").append(message.username + ": " + message.chatString);
+    return "<div class=\"w3-container w3-padding-8\" style='border: 2px solid #dedede; background-color: #f1f1f1; border-radius: 5px;'>" +
+        "  <label style='grid-template-columns: fit-content(100px) fit-content(100px) 1fr;'>" + message.username + ": " +  message.chatString + "</label><br><br>" +
+        "  <label class=\"w3-right\">" + message.time + "</label><br>\n" +
+        "</div>";
 }
 
 function ajaxChatContent() {

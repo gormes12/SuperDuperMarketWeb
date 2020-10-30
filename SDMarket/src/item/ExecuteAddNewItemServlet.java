@@ -5,6 +5,7 @@ import my.project.manager.SystemManager;
 import my.project.manager.ZoneManager;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,29 +41,20 @@ public class ExecuteAddNewItemServlet extends HttpServlet {
         int storeID;
         double itemPrice;
 
-        int itemSerialNumber = zoneManager.addItemAndGetSerialNumber(newItemData.itemName, newItemData.purchaseCategory);
-        for (StoreIdAndPrice storeIdAndPrice : newItemData.selectedStoresIdAndPriceList) {
-            storeID = Integer.parseInt(storeIdAndPrice.id);
-            itemPrice = Double.parseDouble(storeIdAndPrice.price);
-            zoneManager.addItemToStore(storeID, itemSerialNumber, itemPrice);
+        synchronized (ThreadSafeUtils.itemManagerLock) {
+            int itemSerialNumber = zoneManager.addItemAndGetSerialNumber(newItemData.itemName, newItemData.purchaseCategory);
+
+            for (StoreIdAndPrice storeIdAndPrice : newItemData.selectedStoresIdAndPriceList) {
+                storeID = Integer.parseInt(storeIdAndPrice.id);
+                itemPrice = Double.parseDouble(storeIdAndPrice.price);
+                synchronized (ThreadSafeUtils.storeManagerLock) {
+                    zoneManager.addItemToStore(storeID, itemSerialNumber, itemPrice);
+                }
+            }
         }
 
         SystemManager.isInnerInfoChangedInSomeZone = true;
-        return;
 
-            /*Gson gson = new Gson();
-            String jsonResponse;
-
-            jsonResponse = gson.toJson(orderInProcess.createOrderDTO());
-            out.print(jsonResponse);
-            out.flush();*/
-
-            /*} catch (Exception e) {
-                response.setStatus(500);
-                out.print(e.getMessage());
-                out.flush();
-            }*/
-//        }
     }
 
     private class ItemData {

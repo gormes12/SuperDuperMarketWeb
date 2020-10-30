@@ -44,11 +44,6 @@ public class SummaryOrderScServlet extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
 
-            /*Location location = (Location) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_LOCATION);
-            customer.setLocation(location);*/
-
-//            LocalDate date = (LocalDate) request.getSession(false).getAttribute(ConstantsUtils.DATE_ORDER);
-
             Order orderInProcess = SessionUtils.getOrderInProcess(request);
             HashMap<SaleDTO, Integer> salesCart = (HashMap<SaleDTO, Integer>) request.getSession(false).getAttribute(ConstantsUtils.CURRENT_SELECTED_SALES_CART);
 
@@ -64,12 +59,6 @@ public class SummaryOrderScServlet extends HttpServlet {
             jsonResponse = gson.toJson(orderInProcess.createOrderDTO());
             out.print(jsonResponse);
             out.flush();
-
-            /*} catch (Exception e) {
-                response.setStatus(500);
-                out.print(e.getMessage());
-                out.flush();
-            }*/
         }
     }
 

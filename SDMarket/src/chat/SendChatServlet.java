@@ -4,6 +4,7 @@ import my.project.manager.ChatManager;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,7 +24,7 @@ public class SendChatServlet extends HttpServlet {
 
         String userChatString = request.getParameter(ConstantsUtils.CHAT_PARAMETER);
         if (userChatString != null && !userChatString.isEmpty()) {
-            synchronized (getServletContext()) {
+            synchronized (ThreadSafeUtils.chatManagerLock) {
                 chatManager.addChatMessage(userChatString, username);
             }
         }

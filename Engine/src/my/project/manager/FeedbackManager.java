@@ -10,7 +10,7 @@ public class FeedbackManager {
     private HashMap<String, List<Feedback>> feedbacks = new HashMap<>();
     private final List<Feedback> FeedbackAlerts = new ArrayList<>();
 
-    public synchronized void addFeedback(String zoneName, String userGiverFeedback, LocalDate date, int rate, String textRate) {
+    public void addFeedback(String zoneName, String userGiverFeedback, LocalDate date, int rate, String textRate) {
         List<Feedback> feedbackList = feedbacks.getOrDefault(zoneName, null);
         if (feedbackList == null){
             feedbackList = new LinkedList<>();
@@ -26,7 +26,7 @@ public class FeedbackManager {
         feedbacks.put(zoneName, feedbackList);
     }
 
-    public synchronized List<Feedback> getFeedbacksEntries(int fromIndex){
+    public List<Feedback> getFeedbacksEntries(int fromIndex){
         if (fromIndex < 0 || fromIndex > FeedbackAlerts.size()) {
             fromIndex = 0;
         }

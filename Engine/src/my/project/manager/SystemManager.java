@@ -8,7 +8,6 @@ import java.util.*;
 public class SystemManager {
     private static int userID = 1000;
     public static boolean isInnerInfoChangedInSomeZone = false;
-    //    private final StoreManager storeManager = new StoreManager();
     private final ZonesManager zonesManager = new ZonesManager();
     private final UserManager userManager = new UserManager();
     private HashMap<String, ZoneManager> zonesByName = new HashMap<>();

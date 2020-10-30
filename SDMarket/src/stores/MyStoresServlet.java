@@ -6,6 +6,7 @@ import dto.StoreDTO;
 import my.project.manager.ZoneManager;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -48,7 +49,7 @@ public class MyStoresServlet extends HttpServlet {
             }
 
             List<StoreDTO> storesInZone;
-            synchronized (getServletContext()) {
+            synchronized (ThreadSafeUtils.storeManagerLock) {
                 storesInZone = zoneManager.getStores();
             }
 

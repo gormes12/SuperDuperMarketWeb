@@ -11,6 +11,7 @@ import my.project.user.StoreOwner;
 import utils.ConstantsUtils;
 import utils.ServletUtils;
 import utils.SessionUtils;
+import utils.ThreadSafeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -65,7 +66,9 @@ public class ExecuteAddNewStoreServlet extends HttpServlet {
         String ownerZoneName = zoneManager.getOwnerZoneName();
         if (!username.equals(ownerZoneName)){
             StoreOwner storeOwner = (StoreOwner) ServletUtils.getSystemManager(request.getServletContext()).getUserManager().getUser(ownerZoneName);
-            storeOwner.addCompetitiveStore(newStore);
+            synchronized (ThreadSafeUtils.storeManagerLock) {
+                storeOwner.addCompetitiveStore(newStore);
+            }
         }
 
         SystemManager.isInnerInfoChangedInSomeZone = true;
