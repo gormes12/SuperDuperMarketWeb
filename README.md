@@ -30,3 +30,7 @@ In order to deploy SDMarket you will need:
 7. Press `Manager App` 
 8. Inside the applications table look for `SDMarket_Web` link and press it
 9. Welcome to my SDMarket!
+
+## Credits
+
+Mentor: Aviad Cohen
